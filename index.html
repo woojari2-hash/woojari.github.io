@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 독서기록 시스템</title>
+<style>
+  /* 전체적인 레이아웃과 폰트, 색상 설정 */
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+  }
+  h1 { font-size: 20px; text-align: center; margin-bottom: 16px; }
+  input, textarea, button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+  }
+  button {
+    background: #4a6cf7;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover { background: #3a5ce5; }
+  #progressBox {
+    background: #f0f4ff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none; /* 로그인 전에는 숨김 */
+  }
+  .progress-bar-bg {
+    background: #e0e0e0;
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-bar-fill {
+    background: #4a6cf7;
+    height: 100%;
+    transition: width 0.3s;
+  }
+  #message { text-align: center; color: #e74c3c; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 2026 독서기록 시스템</h1>
 
+  <!-- 로그인 영역: 번호만 입력하면 됨 -->
+  <div id="loginArea">
+    <input type="number" id="numberInput" placeholder="출석번호를 입력하세요">
+    <button onclick="login()">확인</button>
+  </div>
+
+  <!-- 로그인 성공 시 보여줄 현재 진행 현황 -->
+  <div id="progressBox">
+    <strong id="studentName"></strong>님, <span id="bookTitle"></span>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div id="progressText" style="font-size:13px; margin-top:4px;"></div>
+  </div>
+
+  <!-- 기록 제출 영역: 로그인 후에만 보임 -->
+  <div id="recordArea" style="display:none;">
+    <input type="number" id="readPageInput" placeholder="오늘 읽은 페이지 수">
+    <textarea id="feelingInput" rows="2" placeholder="한줄소감"></textarea>
+    <textarea id="sentenceInput" rows="2" placeholder="인상깊은 문장"></textarea>
+    <button onclick="submitRecord()">기록 저장하기</button>
+  </div>
+
+  <p id="message"></p>
+</div>
+
+<script>
+  // ⭐ 여기에 배포하신 웹앱 URL을 넣었습니다
+  const API_URL = "https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec";
+
+  let currentStudent = null; // 로그인한 학생 정보를 저장해둘 변수
+
+  // 출석번호로 로그인 처리
+  function login() {
+    const number = document.getElementById('numberInput').value;
+    if (!number) {
+      showMessage('번호를 입력해주세요.');
+      return;
+    }
+
+    showMessage('확인 중...');
+
+    // GET 요청으로 로그인 확인 (action=login)
+    fetch(`${API_URL}?action=login&number=${number}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          currentStudent = data; // 학생 정보 저장
+          renderProgress(data);   // 화면에 현황 표시
+          showMessage('');
+          document.getElementById('recordArea').style.display = 'block';
+        } else {
+          showMessage(data.message || '등록되지 않은 번호입니다.');
+        }
+      })
+      .catch(err => showMessage('서버 연결에 실패했습니다.'));
+  }
+
+  // 현재 진행 현황을 화면에 그려주는 함수
+  function renderProgress(data) {
+    document.getElementById('progressBox').style.display = 'block';
+    document.getElementById('studentName').innerText = data.name;
+    document.getElementById('bookTitle').innerText = `『${data.book}』`;
+
+    const percent = Math.min(100, Math.round((data.readPage / data.totalPage) * 100));
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressText').innerText =
+      `${data.readPage} / ${data.totalPage}쪽 (${percent}%) ${data.isDone === '완독' ? '🎉 완독!' : ''}`;
+  }
+
+  // 오늘의 독서 기록을 제출하는 함수
+  function submitRecord() {
+    const readPage = document.getElementById('readPageInput').value;
+    const feeling = document.getElementById('feelingInput').value;
+    const sentence = document.getElementById('sentenceInput').value;
+
+    if (!readPage) {
+      showMessage('오늘 읽은 페이지 수를 입력해주세요.');
+      return;
+    }
+
+    showMessage('저장 중...');
+
+    // POST 요청으로 기록 제출 (action=updateProgress)
+    fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'updateProgress',
+        number: currentStudent.number,
+        name: currentStudent.name,
+        readPage: Number(readPage),
+        feeling: feeling,
+        impressiveSentence: sentence
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showMessage('✅ 기록이 저장되었습니다!');
+          // 저장 후 최신 현황 다시 불러오기
+          fetch(`${API_URL}?action=getProgress&number=${currentStudent.number}`)
+            .then(res => res.json())
+            .then(d => { currentStudent = d; renderProgress(d); });
+
+          // 입력창 초기화
+          document.getElementById('readPageInput').value = '';
+          document.getElementById('feelingInput').value = '';
+          document.getElementById('sentenceInput').value = '';
+        } else {
+          showMessage(data.message || '저장에 실패했습니다.');
+        }
+      })
+      .catch(err => showMessage('서버 연결에 실패했습니다.'));
+  }
+
+  // 메시지 영역에 안내 문구 표시
+  function showMessage(msg) {
+    document.getElementById('message').innerText = msg;
+  }
+</script>
+</body>
+</html>
