@@ -1,190 +1,464 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>독서기록 현황판</title>
-<style>
-  /* 전체 레이아웃: 카드형 그리드 */
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: #f4f6f8;
-    margin: 0;
-    padding: 20px;
-  }
-  h1 { text-align: center; margin-bottom: 8px; }
-  #summary {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #555;
-    font-size: 14px;
-  }
-  .toolbar {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .toolbar button {
-    padding: 8px 14px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fff;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .toolbar button.active { background: #4a6cf7; color: #fff; border-color: #4a6cf7; }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    padding: 14px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
-  .card-top { display: flex; justify-content: space-between; align-items: center; }
-  .card-name { font-weight: bold; font-size: 15px; }
-  .card-book { font-size: 12px; color: #888; margin-top: 2px; }
-  .progress-bar-bg {
-    background: #e0e0e0;
-    border-radius: 6px;
-    height: 8px;
-    overflow: hidden;
-    margin-top: 8px;
-  }
-  .progress-bar-fill {
-    background: #4a6cf7;
-    height: 100%;
-    transition: width 0.3s;
-  }
-  .card.done .progress-bar-fill { background: #2ecc71; }
-  .percent { font-size: 12px; color: #4a6cf7; font-weight: bold; margin-top: 4px; }
-  .detail {
-    display: none;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed #ddd;
-    font-size: 13px;
-    color: #444;
-  }
-  .detail b { color: #222; }
-  #loading { text-align: center; color: #999; margin-top: 40px; }
-</style>
-</head>
-<body>
-<h1>📚 2026 독서기록 전체 현황판</h1>
-<div id="summary">불러오는 중...</div>
-
-<div class="toolbar">
-  <button onclick="setSort('number')" class="active" id="btnNumber">번호순</button>
-  <button onclick="setSort('name')" id="btnName">이름순</button>
-  <button onclick="setSort('progress')" id="btnProgress">진행률 낮은 순</button>
-</div>
-
-<div id="loading">데이터를 불러오는 중입니다...</div>
-<div class="grid" id="grid"></div>
-
-<script>
-  // ⭐ 배포한 웹앱 URL (index.html과 동일한 주소 사용)
-  const API_URL = "https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec";
-
-  let students = []; // 전체 학생 데이터를 담아둘 배열
-  let currentSort = 'number';
-
-  // 페이지 로드 시 전체 학생 현황 데이터 불러오기
-  function loadData() {
-    // action=getAllProgress : Apps Script 쪽에 전체 목록 반환 기능이 필요합니다
-    fetch(`${API_URL}?action=getAllProgress`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          students = data.list; // [{number, name, book, readPage, totalPage, feeling, sentence}, ...]
-          document.getElementById('loading').style.display = 'none';
-          renderSummary();
-          render();
-        } else {
-          document.getElementById('loading').innerText = '데이터를 불러오지 못했습니다.';
-        }
-      })
-      .catch(() => {
-        document.getElementById('loading').innerText = '서버 연결에 실패했습니다.';
-      });
-  }
-
-  // 상단 요약 문구(전체 인원, 완독 인원) 표시
-  function renderSummary() {
-    const total = students.length;
-    const done = students.filter(s => s.readPage >= s.totalPage).length;
-    document.getElementById('summary').innerText =
-      `전체 ${total}명 중 완독 ${done}명 · 진행 중 ${total - done}명`;
-  }
-
-  // 정렬 기준 변경
-  function setSort(type) {
-    currentSort = type;
-    ['Number','Name','Progress'].forEach(t => {
-      document.getElementById('btn'+t).classList.remove('active');
-    });
-    document.getElementById('btn' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
-    render();
-  }
-
-  // 카드 목록을 화면에 그리는 함수
-  function render() {
-    let list = [...students];
-
-    // 정렬 기준에 따라 배열 정렬
-    if (currentSort === 'number') {
-      list.sort((a, b) => a.number - b.number);
-    } else if (currentSort === 'name') {
-      list.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-    } else if (currentSort === 'progress') {
-      list.sort((a, b) => (a.readPage / a.totalPage) - (b.readPage / b.totalPage));
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>독서기록 현황판</title>
+  <style>
+    /* 전체 레이아웃: index.html 과 톤 맞추기 */
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: linear-gradient(135deg, #eef2ff 0%, #f8fbff 100%);
+      margin: 0;
+      padding: 20px 12px 28px;
+      color: #111827;
     }
 
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
+    h1 {
+      text-align: center;
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #4a6cf7, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-    list.forEach(s => {
-      const percent = Math.min(100, Math.round((s.readPage / s.totalPage) * 100));
-      const isDone = s.readPage >= s.totalPage;
+    #summary {
+      text-align: center;
+      margin-bottom: 14px;
+      color: #6b7280;
+      font-size: 13px;
+    }
 
-      const card = document.createElement('div');
-      card.className = 'card' + (isDone ? ' done' : '');
-      card.innerHTML = `
-        <div class="card-top">
-          <span class="card-name">${s.number}. ${s.name}${isDone ? ' 🎉' : ''}</span>
-        </div>
-        <div class="card-book">『${s.book}』</div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" style="width:${percent}%"></div>
-        </div>
-        <div class="percent">${s.readPage} / ${s.totalPage}쪽 (${percent}%)</div>
-        <div class="detail">
-          <div><b>한줄소감:</b> ${s.feeling || '-'}</div>
-          <div style="margin-top:4px;"><b>인상깊은 문장:</b> ${s.sentence || '-'}</div>
-        </div>
-      `;
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .toolbar button {
+      padding: 7px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 12px;
+      color: #374151;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    }
+    .toolbar button:hover {
+      transform: translateY(-1px);
+      border-color: #4a6cf7;
+    }
+    .toolbar button.active {
+      background: linear-gradient(90deg, #4a6cf7, #6366f1);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+    }
 
-      // 카드 클릭 시 상세(소감/문장) 펼치기/접기
-      card.addEventListener('click', () => {
-        const detail = card.querySelector('.detail');
-        detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+    .grid-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+      padding: 12px 12px 10px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.1s, border-color 0.2s;
+      border: 1px solid #e5e7eb;
+      position: relative;
+    }
+    .card:hover {
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+      transform: translateY(-1px);
+    }
+
+    /* 완독 카드 */
+    .card.done {
+      border-color: #22c55e;
+    }
+
+    /* 스트릭이 긴 학생(예: 7일 이상) 강조 */
+    .card.streak-king {
+      border-width: 2px;
+      border-color: #f97316;
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.25), 0 6px 18px rgba(15, 23, 42, 0.18);
+    }
+    .streak-badge {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #f97316;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .card-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .card-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-book {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 작은 마스코트(알/병아리) */
+    .mascot-box {
+      width: 40px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mascot-egg {
+      width: 26px;
+      height: 35px;
+      border-radius: 50% 50% 45% 45%;
+      background: #fef9c3;
+      border: 2px solid #facc15;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .mascot-crack {
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 17px;
+      height: 2px;
+      background: transparent;
+    }
+    .mascot-face {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      width: 15px;
+      height: 9px;
+      transform: translateX(-50%);
+      display: none;
+    }
+    .mascot-face::before,
+    .mascot-face::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 3px;
+      background: #4b5563;
+      border-radius: 50%;
+    }
+    .mascot-face::before { left: 2px; }
+    .mascot-face::after {
+      right: 2px;
+      box-shadow: 0 4px 0 0 #4b5563;
+      border-radius: 50%;
+    }
+
+    .mascot-egg.stage0 { background: #fef9c3; }
+    .mascot-egg.stage1 {
+      background: linear-gradient(180deg, #fef9c3, #fde68a);
+    }
+    .mascot-egg.stage2 {
+      background: linear-gradient(180deg, #fef3c7, #fdba74);
+    }
+    .mascot-egg.stage2 .mascot-crack {
+      background: #f97316;
+    }
+    .mascot-egg.stage3 {
+      background: linear-gradient(180deg, #fef08a, #facc15);
+      transform: translateY(-1px) scale(1.04);
+    }
+    .mascot-egg.stage3 .mascot-face {
+      display: block;
+    }
+
+    .progress-bar-bg {
+      background: #e5e7eb;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #4a6cf7, #22c55e);
+      height: 100%;
+      transition: width 0.3s;
+      border-radius: 999px;
+      width: 0%;
+    }
+    .card.done .progress-bar-fill {
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+    }
+
+    .percent {
+      font-size: 11.5px;
+      color: #4b5563;
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+    .percent-num {
+      font-weight: 700;
+      color: #4a6cf7;
+    }
+
+    .streak-info {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .detail {
+      display: none;
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px dashed #e5e7eb;
+      font-size: 12px;
+      color: #444;
+    }
+    .detail b {
+      color: #111827;
+    }
+
+    #loading {
+      text-align: center;
+      color: #9ca3af;
+      margin-top: 30px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 2026 독서기록 전체 현황판</h1>
+  <div id="summary">불러오는 중...</div>
+
+  <div class="toolbar">
+    <button onclick="setSort('number')" class="active" id="btnNumber">번호순</button>
+    <button onclick="setSort('name')" id="btnName">이름순</button>
+    <button onclick="setSort('progress')" id="btnProgress">진행률 낮은 순</button>
+    <button onclick="setSort('streak')" id="btnStreak">스트릭 높은 순</button>
+  </div>
+
+  <div class="grid-wrapper">
+    <div id="loading">데이터를 불러오는 중입니다...</div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <script>
+    // ⭐ index.html 과 동일한 Apps Script 웹앱 URL
+    const API_URL = "https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec";
+
+    let students = []; // 전체 학생 데이터
+    let currentSort = 'number';
+
+    /**
+     * 페이지 로드 시 전체 학생 현황 데이터 불러오기
+     * Apps Script 쪽 doGet(e) 에서 action === 'getAll' 을 처리하고 있어야 합니다.
+     */
+    function loadData() {
+      fetch(`${API_URL}?action=getAll`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // 예상 구조: { number, name, book, totalPage, readPage, isDone, lastDate, todayCount, streak }
+            students = data.list || [];
+            document.getElementById('loading').style.display = 'none';
+            renderSummary();
+            render();
+          } else {
+            document.getElementById('loading').innerText = '데이터를 불러오지 못했습니다.';
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('loading').innerText = '서버 연결에 실패했습니다.';
+        });
+    }
+
+    /**
+     * 상단 요약 문구(전체 인원, 완독 인원, 평균 진행률, 평균 스트릭) 표시
+     */
+    function renderSummary() {
+      const total = students.length;
+      const done = students.filter(s => Number(s.totalPage) > 0 && Number(s.readPage) >= Number(s.totalPage)).length;
+      const avgPercent = total
+        ? Math.round(
+            students.reduce((sum, s) => {
+              const t = Number(s.totalPage) || 0;
+              const r = Number(s.readPage) || 0;
+              if (!t) return sum;
+              return sum + Math.min(100, Math.round((r / t) * 100));
+            }, 0) / total
+          )
+        : 0;
+      const avgStreak = total
+        ? Math.round(students.reduce((sum, s) => sum + (Number(s.streak) || 0), 0) / total)
+        : 0;
+
+      document.getElementById('summary').innerText =
+        `총 ${total}명 · 완독 ${done}명 · 평균 진행률 ${avgPercent}% · 평균 스트릭 ${avgStreak}일`;
+    }
+
+    /**
+     * 정렬 기준 변경
+     */
+    function setSort(type) {
+      currentSort = type;
+      ['Number','Name','Progress','Streak'].forEach(t => {
+        const btn = document.getElementById('btn' + t);
+        if (btn) btn.classList.remove('active');
       });
+      const key = type.charAt(0).toUpperCase() + type.slice(1);
+      const targetBtn = document.getElementById('btn' + key);
+      if (targetBtn) targetBtn.classList.add('active');
+      render();
+    }
 
-      grid.appendChild(card);
-    });
-  }
+    /**
+     * 진행률(%) 계산
+     */
+    function calcPercent(readPage, totalPage) {
+      const t = Number(totalPage) || 0;
+      const r = Number(readPage) || 0;
+      if (!t || t <= 0) return 0;
+      const p = Math.round((r / t) * 100);
+      return Math.max(0, Math.min(100, p));
+    }
 
-  loadData(); // 페이지 열리자마자 데이터 불러오기 시작
-</script>
+    /**
+     * 진행률에 따른 마스코트 단계 결정
+     */
+    function getMascotStage(percent) {
+      if (percent >= 80) return 'stage3';
+      if (percent >= 40) return 'stage2';
+      if (percent > 0) return 'stage1';
+      return 'stage0';
+    }
+
+    /**
+     * 카드 목록 렌더링
+     */
+    function render() {
+      let list = [...students];
+
+      // 정렬 기준
+      if (currentSort === 'number') {
+        list.sort((a, b) => Number(a.number) - Number(b.number));
+      } else if (currentSort === 'name') {
+        list.sort((a, b) => String(a.name).localeCompare(String(b.name), 'ko'));
+      } else if (currentSort === 'progress') {
+        list.sort((a, b) => {
+          const pa = calcPercent(a.readPage, a.totalPage);
+          const pb = calcPercent(b.readPage, b.totalPage);
+          return pa - pb;
+        });
+      } else if (currentSort === 'streak') {
+        list.sort((a, b) => (Number(b.streak) || 0) - (Number(a.streak) || 0));
+      }
+
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+
+      list.forEach(s => {
+        const percent = calcPercent(s.readPage, s.totalPage);
+        const isDone = Number(s.totalPage) > 0 && Number(s.readPage) >= Number(s.totalPage);
+        const streak = Number(s.streak) || 0;
+        const todayCount = Number(s.todayCount) || 0;
+
+        const card = document.createElement('div');
+        card.className = 'card' + (isDone ? ' done' : '') + (streak >= 7 ? ' streak-king' : '');
+
+        // streak 왕 배지
+        if (streak >= 7) {
+          const badge = document.createElement('div');
+          badge.className = 'streak-badge';
+          badge.textContent = `${streak}일 스트릭🔥`;
+          card.appendChild(badge);
+        }
+
+        card.innerHTML += `
+          <div class="card-top">
+            <div class="card-main">
+              <div class="card-name">${s.number}. ${s.name}${isDone ? ' 🎉' : ''}</div>
+              <div class="card-book">『${s.book || '배정된 책 없음'}』</div>
+            </div>
+            <div class="mascot-box">
+              <div class="mascot-egg ${getMascotStage(percent)}">
+                <div class="mascot-crack"></div>
+                <div class="mascot-face"></div>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${percent}%"></div>
+          </div>
+          <div class="percent">
+            <span>${s.readPage || 0} / ${s.totalPage || 0}쪽</span>
+            <span class="percent-num">${percent}%</span>
+          </div>
+          <div class="percent">
+            <span class="streak-info">연속 ${streak}일 · 오늘 ${todayCount}번 기록</span>
+          </div>
+          <div class="detail">
+            <div><b>마지막 기록 날짜:</b> ${s.lastDate || '-'}</div>
+            <div style="margin-top:4px;"><b>완독 여부:</b> ${s.isDone || '-'}</div>
+          </div>
+        `;
+
+        // 카드 클릭 시 상세(스트릭/완독 정보) 펼치기/접기
+        card.addEventListener('click', () => {
+          const detail = card.querySelector('.detail');
+          detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // 초기 데이터 로드
+    loadData();
+  </script>
 </body>
 </html>
