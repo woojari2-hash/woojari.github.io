@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>독서기록 현황판</title>
+<style>
+  /* 전체 레이아웃: 카드형 그리드 */
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { text-align: center; margin-bottom: 8px; }
+  #summary {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 14px;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .toolbar button {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .toolbar button.active { background: #4a6cf7; color: #fff; border-color: #4a6cf7; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card-name { font-weight: bold; font-size: 15px; }
+  .card-book { font-size: 12px; color: #888; margin-top: 2px; }
+  .progress-bar-bg {
+    background: #e0e0e0;
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-bar-fill {
+    background: #4a6cf7;
+    height: 100%;
+    transition: width 0.3s;
+  }
+  .card.done .progress-bar-fill { background: #2ecc71; }
+  .percent { font-size: 12px; color: #4a6cf7; font-weight: bold; margin-top: 4px; }
+  .detail {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+    font-size: 13px;
+    color: #444;
+  }
+  .detail b { color: #222; }
+  #loading { text-align: center; color: #999; margin-top: 40px; }
+</style>
+</head>
+<body>
+<h1>📚 2026 독서기록 전체 현황판</h1>
+<div id="summary">불러오는 중...</div>
+
+<div class="toolbar">
+  <button onclick="setSort('number')" class="active" id="btnNumber">번호순</button>
+  <button onclick="setSort('name')" id="btnName">이름순</button>
+  <button onclick="setSort('progress')" id="btnProgress">진행률 낮은 순</button>
+</div>
+
+<div id="loading">데이터를 불러오는 중입니다...</div>
+<div class="grid" id="grid"></div>
+
+<script>
+  // ⭐ 배포한 웹앱 URL (index.html과 동일한 주소 사용)
+  const API_URL = "https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec";
+
+  let students = []; // 전체 학생 데이터를 담아둘 배열
+  let currentSort = 'number';
+
+  // 페이지 로드 시 전체 학생 현황 데이터 불러오기
+  function loadData() {
+    // action=getAllProgress : Apps Script 쪽에 전체 목록 반환 기능이 필요합니다
+    fetch(`${API_URL}?action=getAllProgress`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          students = data.list; // [{number, name, book, readPage, totalPage, feeling, sentence}, ...]
+          document.getElementById('loading').style.display = 'none';
+          renderSummary();
+          render();
+        } else {
+          document.getElementById('loading').innerText = '데이터를 불러오지 못했습니다.';
+        }
+      })
+      .catch(() => {
+        document.getElementById('loading').innerText = '서버 연결에 실패했습니다.';
+      });
+  }
+
+  // 상단 요약 문구(전체 인원, 완독 인원) 표시
+  function renderSummary() {
+    const total = students.length;
+    const done = students.filter(s => s.readPage >= s.totalPage).length;
+    document.getElementById('summary').innerText =
+      `전체 ${total}명 중 완독 ${done}명 · 진행 중 ${total - done}명`;
+  }
+
+  // 정렬 기준 변경
+  function setSort(type) {
+    currentSort = type;
+    ['Number','Name','Progress'].forEach(t => {
+      document.getElementById('btn'+t).classList.remove('active');
+    });
+    document.getElementById('btn' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+    render();
+  }
+
+  // 카드 목록을 화면에 그리는 함수
+  function render() {
+    let list = [...students];
+
+    // 정렬 기준에 따라 배열 정렬
+    if (currentSort === 'number') {
+      list.sort((a, b) => a.number - b.number);
+    } else if (currentSort === 'name') {
+      list.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    } else if (currentSort === 'progress') {
+      list.sort((a, b) => (a.readPage / a.totalPage) - (b.readPage / b.totalPage));
+    }
+
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+
+    list.forEach(s => {
+      const percent = Math.min(100, Math.round((s.readPage / s.totalPage) * 100));
+      const isDone = s.readPage >= s.totalPage;
+
+      const card = document.createElement('div');
+      card.className = 'card' + (isDone ? ' done' : '');
+      card.innerHTML = `
+        <div class="card-top">
+          <span class="card-name">${s.number}. ${s.name}${isDone ? ' 🎉' : ''}</span>
+        </div>
+        <div class="card-book">『${s.book}』</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${percent}%"></div>
+        </div>
+        <div class="percent">${s.readPage} / ${s.totalPage}쪽 (${percent}%)</div>
+        <div class="detail">
+          <div><b>한줄소감:</b> ${s.feeling || '-'}</div>
+          <div style="margin-top:4px;"><b>인상깊은 문장:</b> ${s.sentence || '-'}</div>
+        </div>
+      `;
+
+      // 카드 클릭 시 상세(소감/문장) 펼치기/접기
+      card.addEventListener('click', () => {
+        const detail = card.querySelector('.detail');
+        detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  loadData(); // 페이지 열리자마자 데이터 불러오기 시작
+</script>
+</body>
+</html>
