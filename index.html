@@ -168,8 +168,9 @@
     .info-top {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       margin-bottom: 4px;
+      gap: 8px;
     }
     .info-name {
       font-weight: 700;
@@ -184,6 +185,7 @@
     .info-book {
       font-size: 12px;
       color: #6b7280;
+      margin-top: 2px;
       margin-bottom: 4px;
       white-space: nowrap;
       overflow: hidden;
@@ -201,9 +203,11 @@
     .progress-label {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 12px;
       color: #6b7280;
       margin-bottom: 4px;
+      gap: 4px;
     }
     .progress-bg {
       width: 100%;
@@ -231,6 +235,95 @@
       font-size: 11px;
       font-weight: 600;
       margin-left: 4px;
+    }
+
+    /* 마스코트(알/병아리) */
+    .mascot-box {
+      width: 44px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .mascot-egg {
+      width: 32px;
+      height: 42px;
+      border-radius: 50% 50% 45% 45%;
+      background: #fef9c3;
+      border: 2px solid #facc15;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .mascot-crack {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 20px;
+      height: 2px;
+      background: transparent;
+    }
+    .mascot-face {
+      position: absolute;
+      left: 50%;
+      top: 15px;
+      width: 18px;
+      height: 10px;
+      transform: translateX(-50%);
+      display: none;
+    }
+    .mascot-face::before,
+    .mascot-face::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 3px;
+      background: #4b5563;
+      border-radius: 50%;
+    }
+    .mascot-face::before { left: 3px; }
+    .mascot-face::after {
+      right: 3px;
+      box-shadow: 0 4px 0 0 #4b5563;
+      border-radius: 50%;
+    }
+
+    /* 진행률에 따른 4단계 상태 (0, 1~39, 40~79, 80~100) */
+    .mascot-egg.stage0 {
+      background: #fef9c3;
+    }
+    .mascot-egg.stage1 {
+      background: linear-gradient(180deg, #fef9c3, #fde68a);
+    }
+    .mascot-egg.stage2 {
+      background: linear-gradient(180deg, #fef3c7, #fdba74);
+    }
+    .mascot-egg.stage2 .mascot-crack {
+      background: #f97316;
+    }
+    .mascot-egg.stage3 {
+      background: linear-gradient(180deg, #fef08a, #facc15);
+      transform: translateY(-1px) scale(1.05);
+    }
+    .mascot-egg.stage3 .mascot-face {
+      display: block;
+    }
+
+    /* 스트릭/오늘 기록 정보 */
+    .streak-box {
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .streak-box .dot {
+      font-size: 11px;
+      color: #d1d5db;
     }
 
     /* 푸터 안내 */
@@ -283,10 +376,19 @@
     <div id="studentInfo" style="display:none;">
       <div class="info-card">
         <div class="info-top">
-          <div class="info-name" id="studentName"></div>
-          <div class="info-tag">내 책 정보</div>
+          <div>
+            <div class="info-name" id="studentName"></div>
+            <div class="info-book" id="bookTitle"></div>
+          </div>
+          <!-- 🐣 마스코트 -->
+          <div class="mascot-box">
+            <div class="mascot-egg stage0" id="mascotEgg">
+              <div class="mascot-crack"></div>
+              <div class="mascot-face"></div>
+            </div>
+          </div>
         </div>
-        <div class="info-book" id="bookTitle"></div>
+
         <div class="info-pages" id="pageInfo"></div>
 
         <div class="progress-box">
@@ -297,6 +399,13 @@
           <div class="progress-bg">
             <div class="progress-fill" id="progressFill"></div>
           </div>
+        </div>
+
+        <!-- 스트릭/오늘 기록 정보 -->
+        <div class="streak-box">
+          <span id="streakText">아직 스트릭이 없어요</span>
+          <span class="dot">·</span>
+          <span id="todayCountText">오늘 0번 기록</span>
         </div>
       </div>
 
@@ -345,7 +454,7 @@
   </div>
 
   <script>
-    // ★ Apps Script 웹앱 URL을 여기에 넣어 주세요.
+    // ★ Apps Script 웹앱 URL
     const API_URL = 'https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec';
 
     const numberInput = document.getElementById('numberInput');
@@ -358,6 +467,10 @@
     const pageInfoEl = document.getElementById('pageInfo');
     const percentTextEl = document.getElementById('percentText');
     const progressFillEl = document.getElementById('progressFill');
+
+    const streakTextEl = document.getElementById('streakText');
+    const todayCountTextEl = document.getElementById('todayCountText');
+    const mascotEggEl = document.getElementById('mascotEgg');
 
     const readPageInput = document.getElementById('readPageInput');
     const feelingInput = document.getElementById('feelingInput');
@@ -378,7 +491,19 @@
     }
 
     /**
-     * 카드 영역에 학생 정보/진행률 표시
+     * 마스코트(알/병아리) 상태 업데이트
+     */
+    function updateMascot(percent) {
+      mascotEggEl.classList.remove('stage0', 'stage1', 'stage2', 'stage3');
+      let stage = 'stage0';
+      if (percent >= 80) stage = 'stage3';
+      else if (percent >= 40) stage = 'stage2';
+      else if (percent > 0) stage = 'stage1';
+      mascotEggEl.classList.add(stage);
+    }
+
+    /**
+     * 카드 영역에 학생 정보/진행률/스트릭 표시
      */
     function renderStudentInfo(data) {
       const total = Number(data.totalPage) || 0;
@@ -394,14 +519,27 @@
       percentTextEl.textContent = `${percent}%`;
       progressFillEl.style.width = `${percent}%`;
 
+      // 스트릭/오늘 기록 텍스트
+      const streak = Number(data.streak) || 0;
+      const todayCount = Number(data.todayCount) || 0;
+
+      streakTextEl.textContent =
+        streak > 0 ? `연속 ${streak}일 기록 중` : '아직 스트릭이 없어요';
+      todayCountTextEl.textContent = `오늘 ${todayCount}번 기록`;
+
+      // 마스코트 상태
+      updateMascot(percent);
+
       // 완독 뱃지 표시 여부
+      const percentWrapper = percentTextEl.parentElement;
+      const oldBadge = percentWrapper.querySelector('.badge-done');
+      if (oldBadge) oldBadge.remove();
+
       if (percent === 100 || data.isDone === '완독') {
-        if (!document.querySelector('.badge-done')) {
-          const badge = document.createElement('span');
-          badge.className = 'badge-done';
-          badge.textContent = '완독 축하 🎉';
-          percentTextEl.parentElement.appendChild(badge);
-        }
+        const badge = document.createElement('span');
+        badge.className = 'badge-done';
+        badge.textContent = '완독 축하 🎉';
+        percentWrapper.appendChild(badge);
       }
     }
 
