@@ -1,463 +1,674 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>독서기록 현황판</title>
+  <meta charset="UTF-8" />
+  <title>독서 기록장 - 대시보드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* 전체 레이아웃: index.html 과 톤 맞추기 */
+    :root {
+      --primary: #4f46e5;
+      --primary-soft: #eef2ff;
+      --bg: #f3f4ff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+    }
+
     body {
       font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      background: linear-gradient(135deg, #eef2ff 0%, #f8fbff 100%);
       margin: 0;
-      padding: 20px 12px 28px;
-      color: #111827;
+      padding: 20px 12px 40px;
+      background: radial-gradient(circle at top left, #e0e7ff 0, #f9fafb 45%, #eef2ff 100%);
+      color: var(--text-main);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     h1 {
-      text-align: center;
-      margin: 0 0 4px;
-      font-size: 22px;
+      margin: 0 0 6px;
+      font-size: 24px;
       font-weight: 800;
       background: linear-gradient(90deg, #4a6cf7, #8b5cf6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    #summary {
-      text-align: center;
-      margin-bottom: 14px;
-      color: #6b7280;
+    .subtitle {
       font-size: 13px;
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
+      color: var(--text-sub);
       margin-bottom: 18px;
     }
-    .toolbar button {
-      padding: 7px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 999px;
-      background: #ffffff;
-      cursor: pointer;
-      font-size: 12px;
-      color: #374151;
-      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
-    }
-    .toolbar button:hover {
-      transform: translateY(-1px);
-      border-color: #4a6cf7;
-    }
-    .toolbar button.active {
-      background: linear-gradient(90deg, #4a6cf7, #6366f1);
-      color: #ffffff;
-      border-color: transparent;
-      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
-    }
 
-    .grid-wrapper {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 14px;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-      padding: 12px 12px 10px;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.1s, border-color 0.2s;
-      border: 1px solid #e5e7eb;
-      position: relative;
-    }
-    .card:hover {
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
-      transform: translateY(-1px);
-    }
-
-    /* 완독 카드 */
-    .card.done {
-      border-color: #22c55e;
-    }
-
-    /* 스트릭이 긴 학생(예: 7일 이상) 강조 */
-    .card.streak-king {
-      border-width: 2px;
-      border-color: #f97316;
-      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.25), 0 6px 18px rgba(15, 23, 42, 0.18);
-    }
-    .streak-badge {
-      position: absolute;
-      top: 6px;
-      right: 8px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: #f97316;
-      color: #ffffff;
-      font-size: 10px;
-      font-weight: 700;
-    }
-
-    .card-top {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-    .card-main {
-      flex: 1;
-      min-width: 0;
-    }
-    .card-name {
-      font-weight: 700;
-      font-size: 14px;
-      color: #111827;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card-book {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
-    /* 작은 마스코트(알/병아리) */
-    .mascot-box {
-      width: 40px;
-      height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .mascot-egg {
-      width: 26px;
-      height: 35px;
-      border-radius: 50% 50% 45% 45%;
-      background: #fef9c3;
-      border: 2px solid #facc15;
-      position: relative;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-    }
-    .mascot-crack {
-      position: absolute;
-      left: 5px;
-      right: 5px;
-      top: 17px;
-      height: 2px;
-      background: transparent;
-    }
-    .mascot-face {
-      position: absolute;
-      left: 50%;
-      top: 12px;
-      width: 15px;
-      height: 9px;
-      transform: translateX(-50%);
-      display: none;
-    }
-    .mascot-face::before,
-    .mascot-face::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      width: 3px;
-      height: 3px;
-      background: #4b5563;
-      border-radius: 50%;
-    }
-    .mascot-face::before { left: 2px; }
-    .mascot-face::after {
-      right: 2px;
-      box-shadow: 0 4px 0 0 #4b5563;
-      border-radius: 50%;
-    }
-
-    .mascot-egg.stage0 { background: #fef9c3; }
-    .mascot-egg.stage1 {
-      background: linear-gradient(180deg, #fef9c3, #fde68a);
-    }
-    .mascot-egg.stage2 {
-      background: linear-gradient(180deg, #fef3c7, #fdba74);
-    }
-    .mascot-egg.stage2 .mascot-crack {
-      background: #f97316;
-    }
-    .mascot-egg.stage3 {
-      background: linear-gradient(180deg, #fef08a, #facc15);
-      transform: translateY(-1px) scale(1.04);
-    }
-    .mascot-egg.stage3 .mascot-face {
-      display: block;
-    }
-
-    .progress-bar-bg {
-      background: #e5e7eb;
+    .tag {
+      font-size: 11px;
+      color: var(--primary);
+      background: #e0e7ff;
+      padding: 2px 8px;
       border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .progress-bar-fill {
-      background: linear-gradient(90deg, #4a6cf7, #22c55e);
-      height: 100%;
-      transition: width 0.3s;
-      border-radius: 999px;
-      width: 0%;
-    }
-    .card.done .progress-bar-fill {
-      background: linear-gradient(90deg, #22c55e, #16a34a);
-    }
-
-    .percent {
-      font-size: 11.5px;
-      color: #4b5563;
-      margin-top: 4px;
-      display: flex;
-      justify-content: space-between;
+      display: inline-flex;
       align-items: center;
       gap: 4px;
     }
-    .percent-num {
-      font-weight: 700;
-      color: #4a6cf7;
+
+    .refresh-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffffaa;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .streak-info {
+    .refresh-btn:hover {
+      background: #f3f4ff;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .summary-value {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .summary-sub {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .summary-icon {
+      font-size: 15px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sort-group {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffffaa;
+      overflow: hidden;
+    }
+
+    .sort-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    .sort-btn.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .legend {
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+    }
+
+    .table-card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: #f9fafb;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    th {
       font-size: 11px;
       color: #6b7280;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
-    .detail {
-      display: none;
-      margin-top: 8px;
-      padding-top: 7px;
-      border-top: 1px dashed #e5e7eb;
-      font-size: 12px;
-      color: #444;
-    }
-    .detail b {
-      color: #111827;
+    tbody tr:nth-child(even) {
+      background: #fcfcff;
     }
 
-    #loading {
-      text-align: center;
+    .number-cell {
+      font-weight: 700;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    .name-cell {
+      font-weight: 600;
+    }
+
+    .book-cell {
+      color: #6b7280;
+      max-width: 220px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .progress-cell {
+      min-width: 130px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    .percent-text {
+      font-size: 11px;
+      color: #4b5563;
+      margin-bottom: 2px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .status-done {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-reading {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .status-none {
+      background: #f9fafb;
       color: #9ca3af;
-      margin-top: 30px;
-      font-size: 13px;
     }
 
-    @media (max-width: 640px) {
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      }
+    .mascot-cell {
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .streak-cell {
+      font-size: 11px;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    .streak-hot {
+      color: #f97316;
+      font-weight: 600;
+    }
+
+    .date-cell {
+      font-size: 11px;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .empty {
+      padding: 20px;
+      font-size: 13px;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .error-msg {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b91c1c;
+    }
+
+    @media (max-width: 720px) {
+      th:nth-child(4), td:nth-child(4) { display: none; } /* 책 제목 숨김 */
+      th:nth-child(8), td:nth-child(8) { display: none; } /* 마지막 기록일 숨김 */
     }
   </style>
 </head>
 <body>
-  <h1>📚 2026 독서기록 전체 현황판</h1>
-  <div id="summary">불러오는 중...</div>
+  <div class="container">
+    <h1>독서 기록장 대시보드</h1>
+    <div class="subtitle">
+      Progress 시트 기준으로 학생들의 진행 상황과 스트릭 현황을 한눈에 볼 수 있는 화면입니다.
+    </div>
 
-  <div class="toolbar">
-    <button onclick="setSort('number')" class="active" id="btnNumber">번호순</button>
-    <button onclick="setSort('name')" id="btnName">이름순</button>
-    <button onclick="setSort('progress')" id="btnProgress">진행률 낮은 순</button>
-    <button onclick="setSort('streak')" id="btnStreak">스트릭 높은 순</button>
-  </div>
+    <div class="top-bar">
+      <div class="tag">
+        📚 <span>마지막 읽은 페이지 & 당일 수정 기준</span>
+      </div>
+      <button id="refreshBtn" class="refresh-btn">
+        🔄 새로고침
+      </button>
+    </div>
 
-  <div class="grid-wrapper">
-    <div id="loading">데이터를 불러오는 중입니다...</div>
-    <div class="grid" id="grid"></div>
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-label">
+          <span class="summary-icon">✅</span>
+          완독한 학생 수
+        </div>
+        <div class="summary-value">
+          <span id="doneCount">0</span><span>명</span>
+        </div>
+        <div class="summary-sub" id="doneRateText">전체 0명 중 0%</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          <span class="summary-icon">📈</span>
+          평균 진행률
+        </div>
+        <div class="summary-value">
+          <span id="avgPercent">0</span><span>%</span>
+        </div>
+        <div class="summary-sub" id="avgPageText">평균 0쪽 읽음</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          <span class="summary-icon">🔥</span>
+          오늘 기록한 학생 수
+        </div>
+        <div class="summary-value">
+          <span id="todayWriters">0</span><span>명</span>
+        </div>
+        <div class="summary-sub" id="streakInfoText">연속 기록 0일 이상 0명</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="sort-group">
+        <button class="sort-btn active" data-key="number">번호순</button>
+        <button class="sort-btn" data-key="name">이름순</button>
+        <button class="sort-btn" data-key="percent">진행률순</button>
+        <button class="sort-btn" data-key="streak">스트릭순</button>
+      </div>
+      <div class="legend">
+        <span><span class="legend-dot"></span> 진행률 (누적/전체쪽수)</span>
+        <span>👑 완독 / 🦅 높은 진행률 / 🐣~🐔 성장 단계</span>
+      </div>
+    </div>
+
+    <div class="table-card" id="tableWrapper">
+      <div class="empty" id="loadingMsg">데이터를 불러오는 중입니다…</div>
+      <table id="dataTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>이름</th>
+            <th>책 제목</th>
+            <th>진행률</th>
+            <th>상태</th>
+            <th>캐릭터</th>
+            <th>스트릭</th>
+            <th>마지막 기록</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="errorMessage" class="error-msg"></div>
   </div>
 
   <script>
-    // ⭐ index.html 과 동일한 Apps Script 웹앱 URL
-    const API_URL = "https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec";
+    // index.html에서 사용 중인 것과 "동일한" 웹앱 URL을 넣으세요.
+    const API_URL = '여기에_웹앱_URL_붙여넣기';
 
-    let students = []; // 전체 학생 데이터
-    let currentSort = 'number';
+    const MASCOT_STAGES = [
+      { min: 0,   emoji: '🥚', label: '알' },
+      { min: 1,   emoji: '🐣', label: '부화 시작' },
+      { min: 15,  emoji: '🐤', label: '아기 병아리' },
+      { min: 35,  emoji: '🐥', label: '병아리' },
+      { min: 60,  emoji: '🐔', label: '어른 닭' },
+      { min: 85,  emoji: '🦅', label: '독서 독수리' },
+      { min: 100, emoji: '👑', label: '완독 왕' }
+    ];
 
-    /**
-     * 페이지 로드 시 전체 학생 현황 데이터 불러오기
-     * Apps Script 쪽 doGet(e) 에서 action === 'getAll' 을 처리하고 있어야 합니다.
-     */
-    function loadData() {
-      fetch(`${API_URL}?action=getAll`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            // 예상 구조: { number, name, book, totalPage, readPage, isDone, lastDate, todayCount, streak }
-            students = data.list || [];
-            document.getElementById('loading').style.display = 'none';
-            renderSummary();
-            render();
-          } else {
-            document.getElementById('loading').innerText = '데이터를 불러오지 못했습니다.';
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById('loading').innerText = '서버 연결에 실패했습니다.';
-        });
+    const $ = (id) => document.getElementById(id);
+
+    const refreshBtn = $('refreshBtn');
+    const loadingMsg = $('loadingMsg');
+    const table = $('dataTable');
+    const tableBody = $('tableBody');
+    const errorMessage = $('errorMessage');
+
+    const doneCountEl = $('doneCount');
+    const doneRateTextEl = $('doneRateText');
+    const avgPercentEl = $('avgPercent');
+    const avgPageTextEl = $('avgPageText');
+    const todayWritersEl = $('todayWriters');
+    const streakInfoTextEl = $('streakInfoText');
+
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    let currentSortKey = 'number';
+    let dataList = [];
+
+    function calcPercent(read, total) {
+      if (!total || total <= 0) return 0;
+      return Math.max(0, Math.min(100, Math.round((read / total) * 100)));
     }
 
-    /**
-     * 상단 요약 문구(전체 인원, 완독 인원, 평균 진행률, 평균 스트릭) 표시
-     */
-    function renderSummary() {
-      const total = students.length;
-      const done = students.filter(s => Number(s.totalPage) > 0 && Number(s.readPage) >= Number(s.totalPage)).length;
-      const avgPercent = total
-        ? Math.round(
-            students.reduce((sum, s) => {
-              const t = Number(s.totalPage) || 0;
-              const r = Number(s.readPage) || 0;
-              if (!t) return sum;
-              return sum + Math.min(100, Math.round((r / t) * 100));
-            }, 0) / total
-          )
-        : 0;
-      const avgStreak = total
-        ? Math.round(students.reduce((sum, s) => sum + (Number(s.streak) || 0), 0) / total)
-        : 0;
-
-      document.getElementById('summary').innerText =
-        `총 ${total}명 · 완독 ${done}명 · 평균 진행률 ${avgPercent}% · 평균 스트릭 ${avgStreak}일`;
-    }
-
-    /**
-     * 정렬 기준 변경
-     */
-    function setSort(type) {
-      currentSort = type;
-      ['Number','Name','Progress','Streak'].forEach(t => {
-        const btn = document.getElementById('btn' + t);
-        if (btn) btn.classList.remove('active');
+    function getMascot(percent) {
+      let idx = 0;
+      MASCOT_STAGES.forEach((s, i) => {
+        if (percent >= s.min) idx = i;
       });
-      const key = type.charAt(0).toUpperCase() + type.slice(1);
-      const targetBtn = document.getElementById('btn' + key);
-      if (targetBtn) targetBtn.classList.add('active');
-      render();
+      return MASCOT_STAGES[idx];
     }
 
-    /**
-     * 진행률(%) 계산
-     */
-    function calcPercent(readPage, totalPage) {
-      const t = Number(totalPage) || 0;
-      const r = Number(readPage) || 0;
-      if (!t || t <= 0) return 0;
-      const p = Math.round((r / t) * 100);
-      return Math.max(0, Math.min(100, p));
+    function formatDate(dateValue) {
+      if (!dateValue) return '-';
+      try {
+        const d = new Date(dateValue);
+        if (isNaN(d.getTime())) return String(dateValue);
+        const y = d.getFullYear();
+        const m = ('0' + (d.getMonth() + 1)).slice(-2);
+        const day = ('0' + d.getDate()).slice(-2);
+        return `${y}-${m}-${day}`;
+      } catch (e) {
+        return String(dateValue);
+      }
     }
 
-    /**
-     * 진행률에 따른 마스코트 단계 결정
-     */
-    function getMascotStage(percent) {
-      if (percent >= 80) return 'stage3';
-      if (percent >= 40) return 'stage2';
-      if (percent > 0) return 'stage1';
-      return 'stage0';
+    function buildRow(obj) {
+      const total = Number(obj.totalPage) || 0;
+      const read = Number(obj.readPage) || 0;
+      const percent = calcPercent(read, total);
+      const mascot = getMascot(percent);
+
+      const tr = document.createElement('tr');
+
+      const tdNum = document.createElement('td');
+      tdNum.className = 'number-cell';
+      tdNum.textContent = obj.number;
+      tr.appendChild(tdNum);
+
+      const tdName = document.createElement('td');
+      tdName.className = 'name-cell';
+      tdName.textContent = obj.name;
+      tr.appendChild(tdName);
+
+      const tdBook = document.createElement('td');
+      tdBook.className = 'book-cell';
+      tdBook.textContent = obj.book || '-';
+      tr.appendChild(tdBook);
+
+      const tdProgress = document.createElement('td');
+      tdProgress.className = 'progress-cell';
+      const percentText = document.createElement('div');
+      percentText.className = 'percent-text';
+      percentText.textContent = total
+        ? `${percent}% · ${read}/${total}쪽`
+        : `${read}쪽 (전체쪽수 미입력)`;
+      const barBg = document.createElement('div');
+      barBg.className = 'progress-bar-bg';
+      const barFill = document.createElement('div');
+      barFill.className = 'progress-bar-fill';
+      barFill.style.width = `${percent}%`;
+      barBg.appendChild(barFill);
+      tdProgress.appendChild(percentText);
+      tdProgress.appendChild(barBg);
+      tr.appendChild(tdProgress);
+
+      const tdStatus = document.createElement('td');
+      const spanStatus = document.createElement('span');
+      if (obj.isDone === '완독' || percent === 100) {
+        spanStatus.className = 'status-pill status-done';
+        spanStatus.textContent = '완독';
+      } else if (read > 0) {
+        spanStatus.className = 'status-pill status-reading';
+        spanStatus.textContent = '읽는 중';
+      } else {
+        spanStatus.className = 'status-pill status-none';
+        spanStatus.textContent = '시작 전';
+      }
+      tdStatus.appendChild(spanStatus);
+      tr.appendChild(tdStatus);
+
+      const tdMascot = document.createElement('td');
+      tdMascot.className = 'mascot-cell';
+      tdMascot.textContent = mascot.emoji;
+      tr.appendChild(tdMascot);
+
+      const tdStreak = document.createElement('td');
+      tdStreak.className = 'streak-cell';
+      const streak = Number(obj.streak) || 0;
+      const todayCount = Number(obj.todayCount) || 0;
+      if (streak > 0) {
+        tdStreak.innerHTML =
+          `<span class="${streak >= 3 ? 'streak-hot' : ''}">연속 ${streak}일</span>` +
+          (todayCount > 0 ? ` · 오늘 ${todayCount}번` : '');
+      } else {
+        tdStreak.textContent = '아직 스트릭 없음';
+      }
+      tr.appendChild(tdStreak);
+
+      const tdDate = document.createElement('td');
+      tdDate.className = 'date-cell';
+      tdDate.textContent = formatDate(obj.lastDate);
+      tr.appendChild(tdDate);
+
+      return tr;
     }
 
-    /**
-     * 카드 목록 렌더링
-     */
-    function render() {
-      let list = [...students];
-
-      // 정렬 기준
-      if (currentSort === 'number') {
-        list.sort((a, b) => Number(a.number) - Number(b.number));
-      } else if (currentSort === 'name') {
-        list.sort((a, b) => String(a.name).localeCompare(String(b.name), 'ko'));
-      } else if (currentSort === 'progress') {
-        list.sort((a, b) => {
-          const pa = calcPercent(a.readPage, a.totalPage);
-          const pb = calcPercent(b.readPage, b.totalPage);
-          return pa - pb;
-        });
-      } else if (currentSort === 'streak') {
-        list.sort((a, b) => (Number(b.streak) || 0) - (Number(a.streak) || 0));
+    function updateSummary(list) {
+      if (!list.length) {
+        doneCountEl.textContent = '0';
+        doneRateTextEl.textContent = '전체 0명 중 0%';
+        avgPercentEl.textContent = '0';
+        avgPageTextEl.textContent = '평균 0쪽 읽음';
+        todayWritersEl.textContent = '0';
+        streakInfoTextEl.textContent = '연속 기록 0일 이상 0명';
+        return;
       }
 
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
+      const totalStudents = list.length;
+      const done = list.filter(
+        (s) => s.isDone === '완독' || calcPercent(Number(s.readPage) || 0, Number(s.totalPage) || 0) === 100
+      ).length;
+      const doneRate = Math.round((done / totalStudents) * 100);
 
-      list.forEach(s => {
-        const percent = calcPercent(s.readPage, s.totalPage);
-        const isDone = Number(s.totalPage) > 0 && Number(s.readPage) >= Number(s.totalPage);
-        const streak = Number(s.streak) || 0;
-        const todayCount = Number(s.todayCount) || 0;
+      let sumPercent = 0;
+      let sumRead = 0;
+      let sumTotal = 0;
+      let todayWriters = 0;
+      const today = new Date();
+      const todayStr = formatDate(today);
 
-        const card = document.createElement('div');
-        card.className = 'card' + (isDone ? ' done' : '') + (streak >= 7 ? ' streak-king' : '');
+      const hotStreakers = list.filter((s) => Number(s.streak) >= 3).length;
 
-        // streak 왕 배지
-        if (streak >= 7) {
-          const badge = document.createElement('div');
-          badge.className = 'streak-badge';
-          badge.textContent = `${streak}일 스트릭🔥`;
-          card.appendChild(badge);
+      list.forEach((s) => {
+        const total = Number(s.totalPage) || 0;
+        const read = Number(s.readPage) || 0;
+        sumRead += read;
+        sumTotal += total;
+        sumPercent += calcPercent(read, total);
+        if (Number(s.todayCount) > 0 && formatDate(s.lastDate) === todayStr) {
+          todayWriters += 1;
         }
+      });
 
-        card.innerHTML += `
-          <div class="card-top">
-            <div class="card-main">
-              <div class="card-name">${s.number}. ${s.name}${isDone ? ' 🎉' : ''}</div>
-              <div class="card-book">『${s.book || '배정된 책 없음'}』</div>
-            </div>
-            <div class="mascot-box">
-              <div class="mascot-egg ${getMascotStage(percent)}">
-                <div class="mascot-crack"></div>
-                <div class="mascot-face"></div>
-              </div>
-            </div>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width:${percent}%"></div>
-          </div>
-          <div class="percent">
-            <span>${s.readPage || 0} / ${s.totalPage || 0}쪽</span>
-            <span class="percent-num">${percent}%</span>
-          </div>
-          <div class="percent">
-            <span class="streak-info">연속 ${streak}일 · 오늘 ${todayCount}번 기록</span>
-          </div>
-          <div class="detail">
-            <div><b>마지막 기록 날짜:</b> ${s.lastDate || '-'}</div>
-            <div style="margin-top:4px;"><b>완독 여부:</b> ${s.isDone || '-'}</div>
-          </div>
-        `;
+      const avgPercent = Math.round(sumPercent / totalStudents);
+      const avgRead = Math.round(sumRead / totalStudents);
 
-        // 카드 클릭 시 상세(스트릭/완독 정보) 펼치기/접기
-        card.addEventListener('click', () => {
-          const detail = card.querySelector('.detail');
-          detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
-        });
+      doneCountEl.textContent = done;
+      doneRateTextEl.textContent = `전체 ${totalStudents}명 중 ${doneRate}%`;
+      avgPercentEl.textContent = isNaN(avgPercent) ? 0 : avgPercent;
+      avgPageTextEl.textContent = `평균 ${isNaN(avgRead) ? 0 : avgRead}쪽 읽음`;
+      todayWritersEl.textContent = todayWriters;
+      streakInfoTextEl.textContent = `연속 3일 이상 기록 중인 학생 ${hotStreakers}명`;
+    }
 
-        grid.appendChild(card);
+    function renderTable() {
+      tableBody.innerHTML = '';
+      if (!dataList.length) {
+        table.style.display = 'none';
+        loadingMsg.style.display = 'block';
+        loadingMsg.textContent = '표시할 데이터가 없습니다.';
+        return;
+      }
+      loadingMsg.style.display = 'none';
+      table.style.display = 'table';
+
+      dataList.forEach((item) => {
+        tableBody.appendChild(buildRow(item));
       });
     }
 
-    // 초기 데이터 로드
+    function sortData(key) {
+      currentSortKey = key;
+      sortButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.key === key);
+      });
+
+      dataList.sort((a, b) => {
+        if (key === 'number') {
+          return Number(a.number) - Number(b.number);
+        }
+        if (key === 'name') {
+          return String(a.name).localeCompare(String(b.name), 'ko');
+        }
+        if (key === 'percent') {
+          const pa = calcPercent(Number(a.readPage) || 0, Number(a.totalPage) || 0);
+          const pb = calcPercent(Number(b.readPage) || 0, Number(b.totalPage) || 0);
+          return pb - pa;
+        }
+        if (key === 'streak') {
+          return (Number(b.streak) || 0) - (Number(a.streak) || 0);
+        }
+        return 0;
+      });
+
+      renderTable();
+    }
+
+    async function loadData() {
+      errorMessage.textContent = '';
+      loadingMsg.style.display = 'block';
+      loadingMsg.textContent = '데이터를 불러오는 중입니다…';
+      table.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_URL}?action=getAll`);
+        const json = await res.json();
+        if (!json.success) {
+          throw new Error(json.message || '데이터를 불러오지 못했습니다.');
+        }
+        dataList = json.list || [];
+        updateSummary(dataList);
+        sortData(currentSortKey);
+      } catch (err) {
+        console.error(err);
+        errorMessage.textContent =
+          '데이터를 불러오는 중 오류가 발생했습니다. Apps Script 웹앱 URL과 배포 상태를 한 번 확인해 주세요.';
+        loadingMsg.textContent = '데이터를 불러올 수 없습니다.';
+      }
+    }
+
+    refreshBtn.addEventListener('click', loadData);
+    sortButtons.forEach((btn) =>
+      btn.addEventListener('click', () => sortData(btn.dataset.key))
+    );
+
+    // 최초 로딩
     loadData();
   </script>
 </body>
