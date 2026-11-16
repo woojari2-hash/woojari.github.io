@@ -33,10 +33,10 @@
     }
     .field-group { margin-bottom: 10px; }
     label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }
-    input[type="number"], input[type="text"], textarea {
+    input[type="number"], textarea {
       width: 100%; box-sizing: border-box; border-radius: 10px; border: 1px solid #d1d5db;
       padding: 9px 11px; font-size: 13px; outline: none; background-color: #f9fafb;
-      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     input:focus, textarea:focus {
       border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.12); background-color: #fff;
@@ -44,47 +44,62 @@
     textarea { resize: vertical; min-height: 60px; }
     .button {
       width: 100%; padding: 10px 14px; border-radius: 999px; border: none;
-      font-size: 14px; font-weight: 700; cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
     }
     .button-primary {
       background: linear-gradient(90deg, #4f46e5, #6366f1); color: #fff;
       box-shadow: 0 4px 12px rgba(79,70,229,0.4); margin-top: 6px;
     }
-    .button-primary:hover { transform: translateY(-1px); box-shadow: 0 7px 16px rgba(79,70,229,0.55); }
+    .button-primary:hover { transform: translateY(-1px); }
     .button-secondary {
-      background: #eef2ff; color: #4f46e5;
-      box-shadow: 0 2px 6px rgba(148,163,184,0.4); margin-top: 8px;
+      background: #eef2ff; color: #4f46e5; box-shadow: 0 2px 6px rgba(148,163,184,0.4); margin-top: 8px;
     }
     .button-secondary:hover { background: #e0e7ff; transform: translateY(-1px); }
     .button:disabled { opacity: 0.5; cursor: default; box-shadow: none; transform: none; }
-
-    /* 임시저장/제출 버튼 나란히 */
     .button-row { display: flex; gap: 8px; margin-top: 6px; }
     .button-row .button { margin-top: 0; }
     .button-row .button-secondary { flex: 1; }
     .button-row .button-primary { flex: 1.4; }
-
     .message { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
     .message.error { color: #b91c1c; }
     .message.success { color: #15803d; }
     .message.info { color: #4f46e5; }
 
     .info-card {
-      margin-top: 10px; padding: 10px 11px; border-radius: 14px; background: #f9fafb;
+      margin-top: 10px; padding: 12px 12px; border-radius: 14px; background: #f9fafb;
       border: 1px solid #e5e7eb; font-size: 12.5px; color: #374151;
     }
-    .info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 8px; }
-    .info-name { font-weight: 700; }
-    .info-book {
-      font-size: 12px; color: #6b7280; margin-top: 2px; margin-bottom: 4px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    .info-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .info-name { font-weight: 700; font-size: 14px; }
+    .info-book { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    .info-pages { font-size: 12px; color: #4b5563; margin-top: 6px; }
+
+    /* 🐣 캐릭터 (이모지) */
+    .mascot-box {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex-shrink: 0; min-width: 64px;
     }
-    .info-pages { font-size: 12px; color: #4b5563; }
+    .mascot-emoji {
+      font-size: 42px; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+    }
+    .mascot-stage {
+      margin-top: 4px; font-size: 10px; font-weight: 700; color: #b45309;
+      background: #fef3c7; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+    }
+    @keyframes levelUp {
+      0% { transform: scale(1); } 30% { transform: scale(1.4) rotate(-10deg); }
+      60% { transform: scale(1.2) rotate(8deg); } 100% { transform: scale(1); }
+    }
+    .mascot-emoji.level-up { animation: levelUp 0.7s ease; }
+    .next-stage {
+      margin-top: 8px; font-size: 11.5px; color: #9a3412; background: #fff7ed;
+      border: 1px dashed #fdba74; border-radius: 8px; padding: 5px 8px;
+    }
+
     .progress-box { margin-top: 10px; }
     .progress-label {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 12px; color: #6b7280; margin-bottom: 4px; gap: 4px;
+      font-size: 12px; color: #6b7280; margin-bottom: 4px;
     }
     .progress-bg { width: 100%; height: 9px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
     .progress-fill {
@@ -92,37 +107,15 @@
       background: linear-gradient(90deg, #4f46e5, #22c55e); transition: width 0.4s ease;
     }
     .badge-done {
-      display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px;
-      background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 600; margin-left: 4px;
+      display: inline-flex; padding: 2px 7px; border-radius: 999px; background: #dcfce7;
+      color: #15803d; font-size: 11px; font-weight: 600; margin-left: 4px;
     }
-
-    /* 마스코트 */
-    .mascot-box { width: 44px; height: 52px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mascot-egg {
-      width: 32px; height: 42px; border-radius: 50% 50% 45% 45%; background: #fef9c3;
-      border: 2px solid #facc15; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-      transition: transform 0.3s ease, background 0.3s ease;
-    }
-    .mascot-crack { position: absolute; left: 6px; right: 6px; top: 20px; height: 2px; background: transparent; }
-    .mascot-face { position: absolute; left: 50%; top: 15px; width: 18px; height: 10px; transform: translateX(-50%); display: none; }
-    .mascot-face::before, .mascot-face::after {
-      content: ""; position: absolute; top: 0; width: 3px; height: 3px; background: #4b5563; border-radius: 50%;
-    }
-    .mascot-face::before { left: 3px; }
-    .mascot-face::after { right: 3px; box-shadow: 0 4px 0 0 #4b5563; }
-    .mascot-egg.stage1 { background: linear-gradient(180deg, #fef9c3, #fde68a); }
-    .mascot-egg.stage2 { background: linear-gradient(180deg, #fef3c7, #fdba74); }
-    .mascot-egg.stage2 .mascot-crack { background: #f97316; }
-    .mascot-egg.stage3 { background: linear-gradient(180deg, #fef08a, #facc15); transform: translateY(-1px) scale(1.05); }
-    .mascot-egg.stage3 .mascot-face { display: block; }
-
-    .streak-box { margin-top: 6px; font-size: 11.5px; color: #6b7280; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .streak-box .dot { font-size: 11px; color: #d1d5db; }
+    .streak-box { margin-top: 8px; font-size: 11.5px; color: #6b7280; display: flex; gap: 4px; flex-wrap: wrap; }
+    .streak-box .dot { color: #d1d5db; }
     .footer-note { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 14px; }
-
     @media (max-width: 480px) {
       body { padding: 18px 10px 30px; }
-      .container { padding: 18px 16px 20px; border-radius: 18px; }
+      .container { padding: 18px 16px 20px; }
     }
   </style>
 </head>
@@ -147,10 +140,8 @@
             <div class="info-book" id="bookTitle"></div>
           </div>
           <div class="mascot-box">
-            <div class="mascot-egg stage0" id="mascotEgg">
-              <div class="mascot-crack"></div>
-              <div class="mascot-face"></div>
-            </div>
+            <div class="mascot-emoji" id="mascotEmoji">🥚</div>
+            <div class="mascot-stage" id="mascotStage">알</div>
           </div>
         </div>
         <div class="info-pages" id="pageInfo"></div>
@@ -158,6 +149,7 @@
           <div class="progress-label"><span>진행률</span><span id="percentText">0%</span></div>
           <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
         </div>
+        <div class="next-stage" id="nextStageText"></div>
         <div class="streak-box">
           <span id="streakText">아직 스트릭이 없어요</span>
           <span class="dot">·</span>
@@ -178,8 +170,6 @@
         <label for="sentenceInput">인상깊었던 문장</label>
         <textarea id="sentenceInput" placeholder="책에서 기억에 남는 문장을 그대로 옮겨 적어보세요."></textarea>
       </div>
-
-      <!-- 임시 저장 / 제출 버튼 -->
       <div class="button-row">
         <button id="saveDraftBtn" class="button button-secondary">임시 저장</button>
         <button id="submitBtn" class="button button-primary">제출하기</button>
@@ -191,47 +181,62 @@
   </div>
 
   <script>
+    // ★ Apps Script 웹앱 URL
     const API_URL = 'https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec';
 
-    const numberInput = document.getElementById('numberInput');
-    const loginBtn = document.getElementById('loginBtn');
-    const loginMessage = document.getElementById('loginMessage');
-    const studentInfoBox = document.getElementById('studentInfo');
-    const studentNameEl = document.getElementById('studentName');
-    const bookTitleEl = document.getElementById('bookTitle');
-    const pageInfoEl = document.getElementById('pageInfo');
-    const percentTextEl = document.getElementById('percentText');
-    const progressFillEl = document.getElementById('progressFill');
-    const streakTextEl = document.getElementById('streakText');
-    const todayCountTextEl = document.getElementById('todayCountText');
-    const mascotEggEl = document.getElementById('mascotEgg');
-    const readPageInput = document.getElementById('readPageInput');
-    const feelingInput = document.getElementById('feelingInput');
-    const sentenceInput = document.getElementById('sentenceInput');
-    const saveDraftBtn = document.getElementById('saveDraftBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitMessage = document.getElementById('submitMessage');
+    // 🐣 캐릭터 성장 단계 (숫자는 진행률 %. 몇 쪽만 읽어도 바로 변하도록 초반을 촘촘하게)
+    const MASCOT_STAGES = [
+      { min: 0,   emoji: '🥚', label: '알' },
+      { min: 1,   emoji: '🐣', label: '부화 시작' },
+      { min: 15,  emoji: '🐤', label: '아기 병아리' },
+      { min: 35,  emoji: '🐥', label: '병아리' },
+      { min: 60,  emoji: '🐔', label: '어른 닭' },
+      { min: 85,  emoji: '🦅', label: '독서 독수리' },
+      { min: 100, emoji: '👑', label: '완독 왕' }
+    ];
+
+    // 화면 요소
+    const $ = (id) => document.getElementById(id);
+    const numberInput = $('numberInput'), loginBtn = $('loginBtn'), loginMessage = $('loginMessage');
+    const studentInfoBox = $('studentInfo'), studentNameEl = $('studentName'), bookTitleEl = $('bookTitle');
+    const pageInfoEl = $('pageInfo'), percentTextEl = $('percentText'), progressFillEl = $('progressFill');
+    const streakTextEl = $('streakText'), todayCountTextEl = $('todayCountText');
+    const mascotEmojiEl = $('mascotEmoji'), mascotStageEl = $('mascotStage'), nextStageTextEl = $('nextStageText');
+    const readPageInput = $('readPageInput'), feelingInput = $('feelingInput'), sentenceInput = $('sentenceInput');
+    const saveDraftBtn = $('saveDraftBtn'), submitBtn = $('submitBtn'), submitMessage = $('submitMessage');
 
     let currentStudent = null;
+    let lastStageIndex = -1;
 
-    // 메시지 표시 도우미
-    function showMsg(el, text, type) {
-      el.textContent = text;
-      el.className = 'message' + (type ? ' ' + type : '');
+    function showMsg(el, text, type) { el.textContent = text; el.className = 'message' + (type ? ' ' + type : ''); }
+
+    function calcPercent(read, total) {
+      if (!total || total <= 0) return 0;
+      return Math.max(0, Math.min(100, Math.round((read / total) * 100)));
     }
 
-    function calcPercent(readPage, totalPage) {
-      if (!totalPage || totalPage <= 0) return 0;
-      return Math.max(0, Math.min(100, Math.round((readPage / totalPage) * 100)));
-    }
+    // 캐릭터 단계 갱신
+    function updateMascot(percent, read, total) {
+      let idx = 0;
+      MASCOT_STAGES.forEach((s, i) => { if (percent >= s.min) idx = i; });
+      const stage = MASCOT_STAGES[idx];
+      mascotEmojiEl.textContent = stage.emoji;
+      mascotStageEl.textContent = stage.label;
 
-    function updateMascot(percent) {
-      mascotEggEl.classList.remove('stage0', 'stage1', 'stage2', 'stage3');
-      let stage = 'stage0';
-      if (percent >= 80) stage = 'stage3';
-      else if (percent >= 40) stage = 'stage2';
-      else if (percent > 0) stage = 'stage1';
-      mascotEggEl.classList.add(stage);
+      if (lastStageIndex !== -1 && idx > lastStageIndex) {
+        mascotEmojiEl.classList.remove('level-up');
+        void mascotEmojiEl.offsetWidth;
+        mascotEmojiEl.classList.add('level-up');
+      }
+      lastStageIndex = idx;
+
+      const next = MASCOT_STAGES[idx + 1];
+      if (next && total) {
+        const need = Math.max(1, Math.ceil(total * next.min / 100) - read);
+        nextStageTextEl.textContent = `${need}쪽만 더 읽으면 ${next.emoji} ${next.label}(으)로 성장해요!`;
+      } else {
+        nextStageTextEl.textContent = '최고 단계에 도착했어요! 🎉';
+      }
     }
 
     function renderStudentInfo(data) {
@@ -241,9 +246,7 @@
 
       studentNameEl.textContent = `${data.number}번 ${data.name}`;
       bookTitleEl.textContent = data.book || '배정된 책 정보가 없습니다.';
-      pageInfoEl.textContent = total
-        ? `전체 ${total}쪽 중 지금까지 ${read}쪽 읽었어요.`
-        : `전체 쪽수 정보가 아직 입력되지 않았어요.`;
+      pageInfoEl.textContent = total ? `전체 ${total}쪽 중 지금까지 ${read}쪽 읽었어요.` : '전체 쪽수 정보가 아직 입력되지 않았어요.';
       percentTextEl.textContent = `${percent}%`;
       progressFillEl.style.width = `${percent}%`;
 
@@ -252,7 +255,7 @@
       streakTextEl.textContent = streak > 0 ? `연속 ${streak}일 기록 중 🔥` : '아직 스트릭이 없어요';
       todayCountTextEl.textContent = `오늘 ${todayCount}번 기록`;
 
-      updateMascot(percent);
+      updateMascot(percent, read, total);
 
       const wrapper = percentTextEl.parentElement;
       const old = wrapper.querySelector('.badge-done');
@@ -265,30 +268,22 @@
       }
     }
 
-    // ===== 임시 저장 (이 브라우저에만 저장) =====
-    function getDraftKey(number) { return `readingDraft_${number}`; }
-
-    function loadDraftIfExists(number) {
-      const raw = localStorage.getItem(getDraftKey(number));
+    // ===== 임시 저장 (이 브라우저에만) =====
+    const draftKey = (n) => `readingDraft_${n}`;
+    function loadDraftIfExists(n) {
+      const raw = localStorage.getItem(draftKey(n));
       if (!raw) return;
       try {
         const d = JSON.parse(raw);
-        readPageInput.value = d.readPage || '';
-        feelingInput.value = d.feeling || '';
-        sentenceInput.value = d.sentence || '';
+        readPageInput.value = d.readPage || ''; feelingInput.value = d.feeling || ''; sentenceInput.value = d.sentence || '';
         showMsg(submitMessage, '임시 저장해 둔 내용을 불러왔어요. 수정한 뒤 제출해 주세요.', 'info');
       } catch (e) { console.error(e); }
     }
-
     saveDraftBtn.addEventListener('click', () => {
       if (!currentStudent) { showMsg(submitMessage, '먼저 번호를 입력해 주세요.', 'error'); return; }
-      const draft = {
-        readPage: readPageInput.value.trim(),
-        feeling: feelingInput.value.trim(),
-        sentence: sentenceInput.value.trim(),
-        savedAt: new Date().toISOString()
-      };
-      localStorage.setItem(getDraftKey(currentStudent.number), JSON.stringify(draft));
+      localStorage.setItem(draftKey(currentStudent.number), JSON.stringify({
+        readPage: readPageInput.value.trim(), feeling: feelingInput.value.trim(), sentence: sentenceInput.value.trim()
+      }));
       showMsg(submitMessage, '임시 저장했어요. 나중에 다시 열어서 이어서 쓸 수 있어요.', 'success');
     });
 
@@ -297,7 +292,6 @@
       const num = numberInput.value.trim();
       showMsg(loginMessage, '');
       if (!num) { showMsg(loginMessage, '출석번호를 먼저 입력해 주세요.', 'error'); return; }
-
       loginBtn.disabled = true; loginBtn.textContent = '불러오는 중...';
       try {
         const res = await fetch(`${API_URL}?action=login&number=${encodeURIComponent(num)}`);
@@ -309,8 +303,8 @@
           currentStudent = json;
           showMsg(loginMessage, '내 독서 기록을 불러왔어요.', 'success');
           studentInfoBox.style.display = 'block';
+          lastStageIndex = -1;
           renderStudentInfo(json);
-          // 입력칸 초기화 후 임시 저장 내용 있으면 복원
           readPageInput.value = ''; feelingInput.value = ''; sentenceInput.value = '';
           showMsg(submitMessage, '');
           loadDraftIfExists(json.number);
@@ -319,60 +313,36 @@
         console.error(err);
         showMsg(loginMessage, '서버와 연결하는 중 오류가 발생했어요.', 'error');
         studentInfoBox.style.display = 'none';
-      } finally {
-        loginBtn.disabled = false; loginBtn.textContent = '나의 독서 기록 불러오기';
-      }
+      } finally { loginBtn.disabled = false; loginBtn.textContent = '나의 독서 기록 불러오기'; }
     });
 
-    // ===== 제출 (실제 시트 기록) =====
+    // ===== 제출 =====
     submitBtn.addEventListener('click', async () => {
       showMsg(submitMessage, '');
       if (!currentStudent) { showMsg(submitMessage, '먼저 번호를 입력해서 로그인해 주세요.', 'error'); return; }
-
       const readPage = readPageInput.value.trim();
-      const feeling = feelingInput.value.trim();
-      const sentence = sentenceInput.value.trim();
-      if (!readPage || Number(readPage) <= 0) {
-        showMsg(submitMessage, '오늘 읽은 페이지 수를 적어 주세요.', 'error'); return;
-      }
-
-      // 실수 방지 확인창
-      const ok = confirm(`오늘 ${readPage}쪽 읽은 기록을 제출할까요?\n제출하면 수정할 수 없어요. 내용을 다시 한번 확인해 주세요.`);
-      if (!ok) return;
+      if (!readPage || Number(readPage) <= 0) { showMsg(submitMessage, '오늘 읽은 페이지 수를 적어 주세요.', 'error'); return; }
+      if (!confirm(`오늘 ${readPage}쪽 읽은 기록을 제출할까요?\n제출하면 수정할 수 없어요.`)) return;
 
       submitBtn.disabled = true; submitBtn.textContent = '제출 중...';
       try {
-        const body = {
-          action: 'updateProgress',
-          number: currentStudent.number,
-          name: currentStudent.name,
-          readPage: readPage,
-          feeling: feeling,
-          impressiveSentence: sentence
-        };
-
-        // ★ text/plain 으로 보내야 Apps Script 에서 CORS 오류 없이 받습니다
         const res = await fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(body)
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script용 (CORS 오류 방지)
+          body: JSON.stringify({
+            action: 'updateProgress', number: currentStudent.number, name: currentStudent.name,
+            readPage: readPage, feeling: feelingInput.value.trim(), impressiveSentence: sentenceInput.value.trim()
+          })
         });
         const json = await res.json();
-
-        if (!json.success) {
-          showMsg(submitMessage, json.message || '저장에 실패했어요. 다시 시도해 주세요.', 'error');
-          return;
-        }
+        if (!json.success) { showMsg(submitMessage, json.message || '저장에 실패했어요.', 'error'); return; }
 
         showMsg(submitMessage, '오늘 읽은 내용이 제출되었어요! 🎉', 'success');
         readPageInput.value = ''; feelingInput.value = ''; sentenceInput.value = '';
-        localStorage.removeItem(getDraftKey(currentStudent.number)); // 제출했으니 임시 저장 삭제
+        localStorage.removeItem(draftKey(currentStudent.number));
 
-        // 응답에 최신 값이 들어있으면 바로 반영, 아니면 다시 조회
-        if (json.readPage !== undefined) {
-          currentStudent = json;
-          renderStudentInfo(json);
-        } else {
+        if (json.readPage !== undefined) { currentStudent = json; renderStudentInfo(json); }
+        else {
           const r = await fetch(`${API_URL}?action=getProgress&number=${encodeURIComponent(currentStudent.number)}`);
           const rj = await r.json();
           if (rj.success) { currentStudent = rj; renderStudentInfo(rj); }
@@ -380,9 +350,7 @@
       } catch (err) {
         console.error(err);
         showMsg(submitMessage, '서버와 연결하는 중 오류가 발생했어요.', 'error');
-      } finally {
-        submitBtn.disabled = false; submitBtn.textContent = '제출하기';
-      }
+      } finally { submitBtn.disabled = false; submitBtn.textContent = '제출하기'; }
     });
 
     numberInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
