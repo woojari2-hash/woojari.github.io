@@ -7,115 +7,296 @@
   <style>
     body {
       font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      margin: 0; padding: 24px 16px 40px;
+      margin: 0;
+      padding: 24px 16px 40px;
       background: linear-gradient(135deg, #eef2ff 0%, #f8fbff 100%);
       color: #111827;
     }
     .container {
-      max-width: 420px; margin: 0 auto; background: #fff;
-      border-radius: 20px; padding: 22px 20px 24px;
-      box-shadow: 0 10px 30px rgba(15,23,42,0.12); border: 1px solid #e5e7eb;
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      padding: 22px 20px 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      border: 1px solid #e5e7eb;
     }
     h1 {
-      margin: 0 0 4px; text-align: center; font-size: 22px; font-weight: 800;
+      margin: 0 0 4px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
       background: linear-gradient(90deg, #4a6cf7, #8b5cf6);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .subtitle { text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 18px; }
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 18px;
+    }
     .section-title {
-      font-size: 13px; font-weight: 700; color: #4b5563; margin: 16px 0 6px;
-      display: flex; align-items: center; gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4b5563;
+      margin: 16px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .section-title span.icon {
-      width: 18px; height: 18px; border-radius: 999px; background: #e0e7ff;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 11px; color: #4f46e5;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #e0e7ff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #4f46e5;
     }
-    .field-group { margin-bottom: 10px; }
-    label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }
-    input[type="number"], textarea {
-      width: 100%; box-sizing: border-box; border-radius: 10px; border: 1px solid #d1d5db;
-      padding: 9px 11px; font-size: 13px; outline: none; background-color: #f9fafb;
+    .field-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+    input[type="number"],
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      padding: 9px 11px;
+      font-size: 13px;
+      outline: none;
+      background-color: #f9fafb;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, textarea:focus {
-      border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.12); background-color: #fff;
+    input:focus,
+    textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+      background-color: #fff;
     }
-    textarea { resize: vertical; min-height: 60px; }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
     .button {
-      width: 100%; padding: 10px 14px; border-radius: 999px; border: none;
-      font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
     .button-primary {
-      background: linear-gradient(90deg, #4f46e5, #6366f1); color: #fff;
-      box-shadow: 0 4px 12px rgba(79,70,229,0.4); margin-top: 6px;
+      background: linear-gradient(90deg, #4f46e5, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+      margin-top: 6px;
     }
-    .button-primary:hover { transform: translateY(-1px); }
+    .button-primary:hover {
+      transform: translateY(-1px);
+    }
     .button-secondary {
-      background: #eef2ff; color: #4f46e5; box-shadow: 0 2px 6px rgba(148,163,184,0.4); margin-top: 8px;
+      background: #eef2ff;
+      color: #4f46e5;
+      box-shadow: 0 2px 6px rgba(148, 163, 184, 0.4);
+      margin-top: 8px;
     }
-    .button-secondary:hover { background: #e0e7ff; transform: translateY(-1px); }
-    .button:disabled { opacity: 0.5; cursor: default; box-shadow: none; transform: none; }
-    .button-row { display: flex; gap: 8px; margin-top: 6px; }
-    .button-row .button { margin-top: 0; }
-    .button-row .button-secondary { flex: 1; }
-    .button-row .button-primary { flex: 1.4; }
-    .message { margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px; }
-    .message.error { color: #b91c1c; }
-    .message.success { color: #15803d; }
-    .message.info { color: #4f46e5; }
+    .button-secondary:hover {
+      background: #e0e7ff;
+      transform: translateY(-1px);
+    }
+    .button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    .button-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .button-row .button {
+      margin-top: 0;
+    }
+    .button-row .button-secondary {
+      flex: 1;
+    }
+    .button-row .button-primary {
+      flex: 1.4;
+    }
+    .message {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #6b7280;
+      min-height: 18px;
+    }
+    .message.error {
+      color: #b91c1c;
+    }
+    .message.success {
+      color: #15803d;
+    }
+    .message.info {
+      color: #4f46e5;
+    }
 
     .info-card {
-      margin-top: 10px; padding: 12px 12px; border-radius: 14px; background: #f9fafb;
-      border: 1px solid #e5e7eb; font-size: 12.5px; color: #374151;
+      margin-top: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 12.5px;
+      color: #374151;
     }
-    .info-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .info-name { font-weight: 700; font-size: 14px; }
-    .info-book { font-size: 12px; color: #6b7280; margin-top: 2px; }
-    .info-pages { font-size: 12px; color: #4b5563; margin-top: 6px; }
+    .info-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .info-book {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .info-pages {
+      font-size: 12px;
+      color: #4b5563;
+      margin-top: 6px;
+    }
 
     /* 🐣 캐릭터 (이모지) */
     .mascot-box {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      flex-shrink: 0; min-width: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      min-width: 64px;
     }
     .mascot-emoji {
-      font-size: 42px; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+      font-size: 42px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
     }
     .mascot-stage {
-      margin-top: 4px; font-size: 10px; font-weight: 700; color: #b45309;
-      background: #fef3c7; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
     }
     @keyframes levelUp {
-      0% { transform: scale(1); } 30% { transform: scale(1.4) rotate(-10deg); }
-      60% { transform: scale(1.2) rotate(8deg); } 100% { transform: scale(1); }
+      0% { transform: scale(1); }
+      30% { transform: scale(1.4) rotate(-10deg); }
+      60% { transform: scale(1.2) rotate(8deg); }
+      100% { transform: scale(1); }
     }
-    .mascot-emoji.level-up { animation: levelUp 0.7s ease; }
+    .mascot-emoji.level-up {
+      animation: levelUp 0.7s ease;
+    }
     .next-stage {
-      margin-top: 8px; font-size: 11.5px; color: #9a3412; background: #fff7ed;
-      border: 1px dashed #fdba74; border-radius: 8px; padding: 5px 8px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: #9a3412;
+      background: #fff7ed;
+      border: 1px dashed #fdba74;
+      border-radius: 8px;
+      padding: 5px 8px;
     }
 
-    .progress-box { margin-top: 10px; }
-    .progress-label {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 12px; color: #6b7280; margin-bottom: 4px;
+    .progress-box {
+      margin-top: 10px;
     }
-    .progress-bg { width: 100%; height: 9px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .progress-bg {
+      width: 100%;
+      height: 9px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
     .progress-fill {
-      height: 100%; width: 0%; border-radius: 999px;
-      background: linear-gradient(90deg, #4f46e5, #22c55e); transition: width 0.4s ease;
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      transition: width 0.4s ease;
     }
     .badge-done {
-      display: inline-flex; padding: 2px 7px; border-radius: 999px; background: #dcfce7;
-      color: #15803d; font-size: 11px; font-weight: 600; margin-left: 4px;
+      display: inline-flex;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 4px;
     }
-    .streak-box { margin-top: 8px; font-size: 11.5px; color: #6b7280; display: flex; gap: 4px; flex-wrap: wrap; }
-    .streak-box .dot { color: #d1d5db; }
-    .footer-note { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 14px; }
+    .streak-box {
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: #6b7280;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .streak-box .dot {
+      color: #d1d5db;
+    }
+
+    .edit-hint {
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: #4b5563;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .edit-hint b {
+      color: #4f46e5;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 14px;
+    }
+
     @media (max-width: 480px) {
-      body { padding: 18px 10px 30px; }
-      .container { padding: 18px 16px 20px; }
+      body {
+        padding: 18px 10px 30px;
+      }
+      .container {
+        padding: 18px 16px 20px;
+      }
     }
   </style>
 </head>
@@ -124,7 +305,10 @@
     <h1>독서 기록장</h1>
     <div class="subtitle">번호만 입력하면 나만의 독서 기록장이 열려요 📚</div>
 
-    <div class="section-title"><span class="icon">①</span><span>번호 입력</span></div>
+    <div class="section-title">
+      <span class="icon">①</span>
+      <span>번호 입력</span>
+    </div>
     <div class="field-group">
       <label for="numberInput">출석번호</label>
       <input type="number" id="numberInput" min="1" placeholder="예: 7" />
@@ -132,7 +316,7 @@
     <button id="loginBtn" class="button button-secondary">나의 독서 기록 불러오기</button>
     <div id="loginMessage" class="message"></div>
 
-    <div id="studentInfo" style="display:none;">
+    <div id="studentInfo" style="display: none;">
       <div class="info-card">
         <div class="info-top">
           <div>
@@ -146,8 +330,13 @@
         </div>
         <div class="info-pages" id="pageInfo"></div>
         <div class="progress-box">
-          <div class="progress-label"><span>진행률</span><span id="percentText">0%</span></div>
-          <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-label">
+            <span>진행률</span>
+            <span id="percentText">0%</span>
+          </div>
+          <div class="progress-bg">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
         </div>
         <div class="next-stage" id="nextStageText"></div>
         <div class="streak-box">
@@ -157,68 +346,115 @@
         </div>
       </div>
 
-      <div class="section-title"><span class="icon">②</span><span>오늘 읽은 내용 기록하기</span></div>
-      <div class="field-group">
-        <label for="readPageInput">오늘 읽은 페이지 수</label>
-        <input type="number" id="readPageInput" min="1" placeholder="예: 15" />
+      <div class="section-title">
+        <span class="icon">②</span>
+        <span>오늘 읽은 내용 기록하기</span>
       </div>
+
       <div class="field-group">
-        <label for="feelingInput">오늘의 한줄소감</label>
-        <textarea id="feelingInput" placeholder="오늘 읽으면서 느낀 점을 한 줄로 적어보세요."></textarea>
+        <label for="lastPageInput">마지막으로 읽은 페이지</label>
+        <input
+          type="number"
+          id="lastPageInput"
+          min="1"
+          placeholder="예: 37 (37쪽까지 읽었으면 37)"
+        />
       </div>
+
+      <!-- 인상깊은 문장 위, 한줄소감 아래 -->
       <div class="field-group">
         <label for="sentenceInput">인상깊었던 문장</label>
-        <textarea id="sentenceInput" placeholder="책에서 기억에 남는 문장을 그대로 옮겨 적어보세요."></textarea>
+        <textarea
+          id="sentenceInput"
+          placeholder="책에서 기억에 남는 문장을 그대로 옮겨 적어보세요."
+        ></textarea>
       </div>
+
+      <div class="field-group">
+        <label for="feelingInput">오늘의 한줄소감</label>
+        <textarea
+          id="feelingInput"
+          placeholder="오늘 읽으면서 느낀 점을 한 줄로 적어보세요."
+        ></textarea>
+      </div>
+
       <div class="button-row">
         <button id="saveDraftBtn" class="button button-secondary">임시 저장</button>
         <button id="submitBtn" class="button button-primary">제출하기</button>
       </div>
       <div id="submitMessage" class="message"></div>
+
+      <div class="edit-hint">
+        오늘 안에는 같은 번호로 다시 제출하면 <b>이전 기록이 수정</b>돼요.<br />
+        잘못 썼다면 다시 한 번 제출해도 괜찮아요.
+      </div>
     </div>
 
-    <div class="footer-note">임시 저장은 이 기기에만 남고, 제출하면 선생님께 전달돼요 🙂</div>
+    <div class="footer-note">
+      임시 저장은 이 기기에만 남고, <b>제출하면 선생님께 전달</b>돼요.<br />
+      같은 날에는 다시 제출하면 마지막 기록이 수정됩니다 🙂
+    </div>
   </div>
 
   <script>
-    // ★ Apps Script 웹앱 URL
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzbQgWdJHOqe23Fp54Db0p_IAwTR_hLJz7KrtZs2vrhr72m-vk_D5KSWYy1es3ErK0/exec';
+    // ★ 여기에는 "웹 앱으로 배포"에서 받은 스크립트 URL을 그대로 붙여 넣으세요.
+    // 예: const API_URL = 'https://script.google.com/macros/s/AKfycbxxxxx/exec';
+    const API_URL = '여기에_웹앱_URL_붙여넣기';
 
-    // 🐣 캐릭터 성장 단계 (숫자는 진행률 %. 몇 쪽만 읽어도 바로 변하도록 초반을 촘촘하게)
+    // 캐릭터 단계
     const MASCOT_STAGES = [
-      { min: 0,   emoji: '🥚', label: '알' },
-      { min: 1,   emoji: '🐣', label: '부화 시작' },
-      { min: 15,  emoji: '🐤', label: '아기 병아리' },
-      { min: 35,  emoji: '🐥', label: '병아리' },
-      { min: 60,  emoji: '🐔', label: '어른 닭' },
-      { min: 85,  emoji: '🦅', label: '독서 독수리' },
+      { min: 0, emoji: '🥚', label: '알' },
+      { min: 1, emoji: '🐣', label: '부화 시작' },
+      { min: 15, emoji: '🐤', label: '아기 병아리' },
+      { min: 35, emoji: '🐥', label: '병아리' },
+      { min: 60, emoji: '🐔', label: '어른 닭' },
+      { min: 85, emoji: '🦅', label: '독서 독수리' },
       { min: 100, emoji: '👑', label: '완독 왕' }
     ];
 
-    // 화면 요소
     const $ = (id) => document.getElementById(id);
-    const numberInput = $('numberInput'), loginBtn = $('loginBtn'), loginMessage = $('loginMessage');
-    const studentInfoBox = $('studentInfo'), studentNameEl = $('studentName'), bookTitleEl = $('bookTitle');
-    const pageInfoEl = $('pageInfo'), percentTextEl = $('percentText'), progressFillEl = $('progressFill');
-    const streakTextEl = $('streakText'), todayCountTextEl = $('todayCountText');
-    const mascotEmojiEl = $('mascotEmoji'), mascotStageEl = $('mascotStage'), nextStageTextEl = $('nextStageText');
-    const readPageInput = $('readPageInput'), feelingInput = $('feelingInput'), sentenceInput = $('sentenceInput');
-    const saveDraftBtn = $('saveDraftBtn'), submitBtn = $('submitBtn'), submitMessage = $('submitMessage');
+
+    const numberInput = $('numberInput');
+    const loginBtn = $('loginBtn');
+    const loginMessage = $('loginMessage');
+
+    const studentInfoBox = $('studentInfo');
+    const studentNameEl = $('studentName');
+    const bookTitleEl = $('bookTitle');
+    const pageInfoEl = $('pageInfo');
+    const percentTextEl = $('percentText');
+    const progressFillEl = $('progressFill');
+    const streakTextEl = $('streakText');
+    const todayCountTextEl = $('todayCountText');
+    const mascotEmojiEl = $('mascotEmoji');
+    const mascotStageEl = $('mascotStage');
+    const nextStageTextEl = $('nextStageText');
+
+    const lastPageInput = $('lastPageInput');
+    const feelingInput = $('feelingInput');
+    const sentenceInput = $('sentenceInput');
+    const saveDraftBtn = $('saveDraftBtn');
+    const submitBtn = $('submitBtn');
+    const submitMessage = $('submitMessage');
 
     let currentStudent = null;
     let lastStageIndex = -1;
 
-    function showMsg(el, text, type) { el.textContent = text; el.className = 'message' + (type ? ' ' + type : ''); }
+    function showMsg(el, text, type) {
+      el.textContent = text;
+      el.className = 'message' + (type ? ' ' + type : '');
+    }
 
     function calcPercent(read, total) {
       if (!total || total <= 0) return 0;
       return Math.max(0, Math.min(100, Math.round((read / total) * 100)));
     }
 
-    // 캐릭터 단계 갱신
     function updateMascot(percent, read, total) {
       let idx = 0;
-      MASCOT_STAGES.forEach((s, i) => { if (percent >= s.min) idx = i; });
+      MASCOT_STAGES.forEach((s, i) => {
+        if (percent >= s.min) idx = i;
+      });
       const stage = MASCOT_STAGES[idx];
       mascotEmojiEl.textContent = stage.emoji;
       mascotStageEl.textContent = stage.label;
@@ -232,7 +468,7 @@
 
       const next = MASCOT_STAGES[idx + 1];
       if (next && total) {
-        const need = Math.max(1, Math.ceil(total * next.min / 100) - read);
+        const need = Math.max(1, Math.ceil((total * next.min) / 100) - read);
         nextStageTextEl.textContent = `${need}쪽만 더 읽으면 ${next.emoji} ${next.label}(으)로 성장해요!`;
       } else {
         nextStageTextEl.textContent = '최고 단계에 도착했어요! 🎉';
@@ -246,13 +482,16 @@
 
       studentNameEl.textContent = `${data.number}번 ${data.name}`;
       bookTitleEl.textContent = data.book || '배정된 책 정보가 없습니다.';
-      pageInfoEl.textContent = total ? `전체 ${total}쪽 중 지금까지 ${read}쪽 읽었어요.` : '전체 쪽수 정보가 아직 입력되지 않았어요.';
+      pageInfoEl.textContent = total
+        ? `전체 ${total}쪽 중 지금까지 ${read}쪽 읽었어요.`
+        : '전체 쪽수 정보가 아직 입력되지 않았어요.';
       percentTextEl.textContent = `${percent}%`;
       progressFillEl.style.width = `${percent}%`;
 
       const streak = Number(data.streak) || 0;
       const todayCount = Number(data.todayCount) || 0;
-      streakTextEl.textContent = streak > 0 ? `연속 ${streak}일 기록 중 🔥` : '아직 스트릭이 없어요';
+      streakTextEl.textContent =
+        streak > 0 ? `연속 ${streak}일 기록 중 🔥` : '아직 스트릭이 없어요';
       todayCountTextEl.textContent = `오늘 ${todayCount}번 기록`;
 
       updateMascot(percent, read, total);
@@ -268,92 +507,192 @@
       }
     }
 
-    // ===== 임시 저장 (이 브라우저에만) =====
+    // 임시 저장 (localStorage)
     const draftKey = (n) => `readingDraft_${n}`;
     function loadDraftIfExists(n) {
       const raw = localStorage.getItem(draftKey(n));
       if (!raw) return;
       try {
         const d = JSON.parse(raw);
-        readPageInput.value = d.readPage || ''; feelingInput.value = d.feeling || ''; sentenceInput.value = d.sentence || '';
-        showMsg(submitMessage, '임시 저장해 둔 내용을 불러왔어요. 수정한 뒤 제출해 주세요.', 'info');
-      } catch (e) { console.error(e); }
+        lastPageInput.value = d.lastPage || '';
+        sentenceInput.value = d.sentence || '';
+        feelingInput.value = d.feeling || '';
+        showMsg(
+          submitMessage,
+          '임시 저장해 둔 내용을 불러왔어요. 수정한 뒤 제출해 주세요.',
+          'info'
+        );
+      } catch (e) {
+        console.error(e);
+      }
     }
+
     saveDraftBtn.addEventListener('click', () => {
-      if (!currentStudent) { showMsg(submitMessage, '먼저 번호를 입력해 주세요.', 'error'); return; }
-      localStorage.setItem(draftKey(currentStudent.number), JSON.stringify({
-        readPage: readPageInput.value.trim(), feeling: feelingInput.value.trim(), sentence: sentenceInput.value.trim()
-      }));
-      showMsg(submitMessage, '임시 저장했어요. 나중에 다시 열어서 이어서 쓸 수 있어요.', 'success');
+      if (!currentStudent) {
+        showMsg(submitMessage, '먼저 번호를 입력해 주세요.', 'error');
+        return;
+      }
+      localStorage.setItem(
+        draftKey(currentStudent.number),
+        JSON.stringify({
+          lastPage: lastPageInput.value.trim(),
+          sentence: sentenceInput.value.trim(),
+          feeling: feelingInput.value.trim()
+        })
+      );
+      showMsg(
+        submitMessage,
+        '임시 저장했어요. 나중에 다시 열어서 이어서 쓸 수 있어요.',
+        'success'
+      );
     });
 
-    // ===== 로그인 =====
+    // 로그인
     loginBtn.addEventListener('click', async () => {
       const num = numberInput.value.trim();
       showMsg(loginMessage, '');
-      if (!num) { showMsg(loginMessage, '출석번호를 먼저 입력해 주세요.', 'error'); return; }
-      loginBtn.disabled = true; loginBtn.textContent = '불러오는 중...';
+      if (!num) {
+        showMsg(loginMessage, '출석번호를 먼저 입력해 주세요.', 'error');
+        return;
+      }
+      loginBtn.disabled = true;
+      loginBtn.textContent = '불러오는 중...';
       try {
-        const res = await fetch(`${API_URL}?action=login&number=${encodeURIComponent(num)}`);
+        const res = await fetch(
+          `${API_URL}?action=login&number=${encodeURIComponent(num)}`
+        );
         const json = await res.json();
         if (!json.success) {
-          showMsg(loginMessage, json.message || '번호를 다시 확인해 주세요.', 'error');
-          studentInfoBox.style.display = 'none'; currentStudent = null;
+          showMsg(
+            loginMessage,
+            json.message || '번호를 다시 확인해 주세요.',
+            'error'
+          );
+          studentInfoBox.style.display = 'none';
+          currentStudent = null;
         } else {
           currentStudent = json;
           showMsg(loginMessage, '내 독서 기록을 불러왔어요.', 'success');
           studentInfoBox.style.display = 'block';
           lastStageIndex = -1;
           renderStudentInfo(json);
-          readPageInput.value = ''; feelingInput.value = ''; sentenceInput.value = '';
+          lastPageInput.value = '';
+          sentenceInput.value = '';
+          feelingInput.value = '';
           showMsg(submitMessage, '');
           loadDraftIfExists(json.number);
         }
       } catch (err) {
         console.error(err);
-        showMsg(loginMessage, '서버와 연결하는 중 오류가 발생했어요.', 'error');
+        showMsg(
+          loginMessage,
+          '서버와 연결하는 중 오류가 발생했어요.',
+          'error'
+        );
         studentInfoBox.style.display = 'none';
-      } finally { loginBtn.disabled = false; loginBtn.textContent = '나의 독서 기록 불러오기'; }
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = '나의 독서 기록 불러오기';
+      }
     });
 
-    // ===== 제출 =====
+    // 제출
     submitBtn.addEventListener('click', async () => {
       showMsg(submitMessage, '');
-      if (!currentStudent) { showMsg(submitMessage, '먼저 번호를 입력해서 로그인해 주세요.', 'error'); return; }
-      const readPage = readPageInput.value.trim();
-      if (!readPage || Number(readPage) <= 0) { showMsg(submitMessage, '오늘 읽은 페이지 수를 적어 주세요.', 'error'); return; }
-      if (!confirm(`오늘 ${readPage}쪽 읽은 기록을 제출할까요?\n제출하면 수정할 수 없어요.`)) return;
+      if (!currentStudent) {
+        showMsg(
+          submitMessage,
+          '먼저 번호를 입력해서 로그인해 주세요.',
+          'error'
+        );
+        return;
+      }
 
-      submitBtn.disabled = true; submitBtn.textContent = '제출 중...';
+      const lastPage = lastPageInput.value.trim();
+      if (!lastPage || Number(lastPage) <= 0) {
+        showMsg(
+          submitMessage,
+          '마지막으로 읽은 페이지 번호를 적어 주세요.',
+          'error'
+        );
+        return;
+      }
+
+      if (
+        !confirm(
+          `지금까지 ${lastPage}쪽까지 읽은 것으로 제출할까요?\n` +
+            '같은 날에는 다시 제출하면 이 기록이 수정돼요.'
+        )
+      )
+        return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '제출 중...';
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script용 (CORS 오류 방지)
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            action: 'updateProgress', number: currentStudent.number, name: currentStudent.name,
-            readPage: readPage, feeling: feelingInput.value.trim(), impressiveSentence: sentenceInput.value.trim()
+            action: 'updateProgress',
+            number: currentStudent.number,
+            name: currentStudent.name,
+            lastPage: lastPage,
+            feeling: feelingInput.value.trim(),
+            impressiveSentence: sentenceInput.value.trim()
           })
         });
         const json = await res.json();
-        if (!json.success) { showMsg(submitMessage, json.message || '저장에 실패했어요.', 'error'); return; }
 
-        showMsg(submitMessage, '오늘 읽은 내용이 제출되었어요! 🎉', 'success');
-        readPageInput.value = ''; feelingInput.value = ''; sentenceInput.value = '';
+        if (!json.success) {
+          showMsg(
+            submitMessage,
+            json.message || '저장에 실패했어요.',
+            'error'
+          );
+          return;
+        }
+
+        showMsg(
+          submitMessage,
+          json.message || '오늘 읽은 내용이 제출되었어요! 🎉',
+          'success'
+        );
+        lastPageInput.value = '';
+        sentenceInput.value = '';
+        feelingInput.value = '';
         localStorage.removeItem(draftKey(currentStudent.number));
 
-        if (json.readPage !== undefined) { currentStudent = json; renderStudentInfo(json); }
-        else {
-          const r = await fetch(`${API_URL}?action=getProgress&number=${encodeURIComponent(currentStudent.number)}`);
+        if (json.readPage !== undefined) {
+          currentStudent = json;
+          renderStudentInfo(json);
+        } else {
+          const r = await fetch(
+            `${API_URL}?action=getProgress&number=${encodeURIComponent(
+              currentStudent.number
+            )}`
+          );
           const rj = await r.json();
-          if (rj.success) { currentStudent = rj; renderStudentInfo(rj); }
+          if (rj.success) {
+            currentStudent = rj;
+            renderStudentInfo(rj);
+          }
         }
       } catch (err) {
         console.error(err);
-        showMsg(submitMessage, '서버와 연결하는 중 오류가 발생했어요.', 'error');
-      } finally { submitBtn.disabled = false; submitBtn.textContent = '제출하기'; }
+        showMsg(
+          submitMessage,
+          '서버와 연결하는 중 오류가 발생했어요.',
+          'error'
+        );
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '제출하기';
+      }
     });
 
-    numberInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+    numberInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
   </script>
 </body>
 </html>
